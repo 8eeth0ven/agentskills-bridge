@@ -2,7 +2,6 @@
 
 Skill、Agent、Workflow 三种资产形态之间的双向转换器。一份 SKILL.md 可以转换成 11 种主流框架格式,任何一个框架工程也能还原回 skill;workflow 与 agent 之间同样互转。
 
-[![CI](https://github.com/8eeth0ven/agentskills-bridge/actions/workflows/ci.yml/badge.svg)](https://github.com/8eeth0ven/agentskills-bridge/actions/workflows/ci.yml)
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)]()
 [![Formats](https://img.shields.io/badge/formats-11-purple)]()
 [![License](https://img.shields.io/badge/license-MIT-lightgrey)]()
