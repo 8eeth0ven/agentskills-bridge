@@ -60,7 +60,7 @@ python3 cli.py ir examples/agent-fullcycle-engineering --out out/ir.json
 python3 cli.py wiki list && python3 cli.py wiki read 03-frameworks/crewai.md
 ```
 
-想先看输入→输出长什么样?四个真实转换案例(正向 / 第三方 CrewAI 项目反向 / Langflow 官方 flow 反向 / roundtrip 哈希保真)见 [examples/SHOWCASE.md](examples/SHOWCASE.md)。
+想先看输入→输出长什么样?八个真实转换案例(正向 / 第三方 CrewAI 项目反向 / Langflow 官方 flow 反向 / roundtrip 哈希保真 / 官方 docx 脚本型技能 / 真实 subagent 反向 / 11 节点复杂 flow / 中文全目标)见 [examples/SHOWCASE.md](examples/SHOWCASE.md);各能力(scripts、渐进披露、工具契约……)在 9 种形态下的保留情况见 [能力对照矩阵](examples/CAPABILITY-MATRIX.md)。
 
 ## 测试与评测
 

@@ -130,4 +130,102 @@ write_skill(parsed, "out/case4-back")              # flow.json → skill
 system_prompt: 输入 12737 字符 → 还原 12737 字符(F_prompt = 1.0)
 ```
 
-完整评测(27 条链路 × 6 项指标、外部真实语料、真实 LLM 端到端)见 [evaluation/REPORT.md](../evaluation/REPORT.md),复现入口 `python3 evaluation/run_eval.py`。
+## 案例 5:anthropics 官方 docx skill → skill 目录形态(scripts/ 完整迁移)
+
+输入是 [anthropics/skills](https://github.com/anthropics/skills) 官方仓库的 **docx** skill——脚本驱动型技能(`scripts/` 下 59 个 Python/XML 文件,无 references),最能检验执行资源层的保留:
+
+```bash
+# clone 官方仓库后
+python3 cli.py skill2agent ./skills/docx --target crewai-skills --out out/case5a
+python3 cli.py skill2agent ./skills/docx --target deepagents    --out out/case5b
+python3 cli.py skill2agent ./skills/docx --target claude-subagent --out out/case5c
+```
+
+实际结果:
+
+```text
+crewai-skills:  skills/docx/scripts/ 迁移 59/59 个文件 ✅
+deepagents:     skills/docx/scripts/ 迁移 59/59 个文件 ✅
+claude-subagent: .claude/agents/docx.md(触发性 description 原样保留)
+```
+
+`claude-subagent` 产物头部(实际输出,description 即触发条件):
+
+```yaml
+---
+name: "docx"
+description: "Use this skill whenever the user wants to create, read, edit, or
+  manipulate Word documents (.docx files)... If the user asks for a 'report',
+  'memo', 'letter'... use this skill."
+tools:
+  - "Read"
+  - "Grep"
+  - "Glob"
+  - "Bash"
+model: "sonnet"
+---
+```
+
+> 这个案例暴露并修复过一个真实缺陷:早期版本只迁 SKILL.md + references,scripts/ 全丢——由 [能力对照矩阵](CAPABILITY-MATRIX.md) 钉出后修复。脚本型技能优先选 skill 目录形态 target(crewai-skills / deepagents)。
+
+## 案例 6:真实 Claude subagent → skill(反向)
+
+输入是 [wshobson/agents](https://github.com/wshobson/agents) 社区仓库的真实 subagent **backend-architect**(frontmatter 含 `model: inherit` 扩展值):
+
+```bash
+python3 cli.py agent2skill ./backend-architect --from claude-subagent --out out/case6
+```
+
+原 `.claude/agents/backend-architect.md`(原文)→ 生成的 `SKILL.md`(实际输出),frontmatter 逐字段保留:
+
+```markdown
+---
+name: backend-development-backend-architect
+description: Expert backend architect specializing in scalable API design,
+  microservices architecture, and distributed systems... Use PROACTIVELY when
+  creating new backend services or APIs.
+---
+
+You are a backend system architect specializing in scalable, resilient, and
+maintainable backend systems and APIs.
+
+## Purpose
+
+Expert backend architect with comprehensive knowledge of modern API design...
+```
+
+## 案例 7:Langflow 官方 research_agent(11 节点复杂 flow)→ skill
+
+比案例 3 更重的输入——官方夹具 [research_agent.json](https://github.com/langflow-ai/langflow/blob/main/src/lfx/tests/fixtures/starter_flows/v1.9.0/research_agent.json)(**11 个节点 / 10 条边**,含 Tool、Search API 组件):
+
+```bash
+python3 cli.py agent2skill ./research_agent.json --from langflow --out out/case7
+```
+
+成功提取(生成的 SKILL.md 头部,实际输出):
+
+```markdown
+---
+name: research-agent
+description: Agent that generates focused plans, conducts web searches, and
+  synthesizes findings into comprehensive reports.
+---
+```
+
+## 案例 8:中文 skill → 全部 9 种目标 + 逐字节 roundtrip
+
+输入为中文语料(含多级列表、代码块、引号、emoji),一次转全部 9 种目标再从 langflow 产物还原:
+
+```bash
+for t in crewai crewai-skills deepagents langchain langflow openai claude-subagent autogen generic; do
+  python3 cli.py skill2agent evaluation/corpus/S2_cn --target $t --out out/case8/$t
+done
+python3 cli.py agent2skill out/case8/langflow --from langflow --out out/case8-back
+diff evaluation/corpus/S2_cn/SKILL.md out/case8-back/SKILL.md
+```
+
+实际结果:9 个 target 全部成功;`diff` 无输出——**中文 SKILL.md 经 flow.json 编码往返后逐字节一致**。
+
+---
+
+各能力(name/正文/知识/scripts/工具契约)在 9 种形态下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md);完整评测见 [evaluation/REPORT.md](../evaluation/REPORT.md)。

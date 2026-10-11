@@ -38,6 +38,7 @@ def emit_crewai_skills(ir: AgentIR, out_dir: str | Path) -> Path:
     skill_dir = out / "skills" / name
     skill_dir.mkdir(parents=True, exist_ok=True)
     written = _write_references(ir, skill_dir)
+    _write_scripts(ir, skill_dir)
     (skill_dir / "SKILL.md").write_text(_skill_md(ir, name), encoding="utf-8")
     (out / "config").mkdir(parents=True, exist_ok=True)
     (out / "config" / "agents.yaml").write_text(_agents_yaml(ir, name), encoding="utf-8")
@@ -124,6 +125,34 @@ def _write_references(ir: AgentIR, skill_dir: Path) -> List[str]:
         (rdir / name).write_text(doc.content or "", encoding="utf-8")
         written.append(name)
     return written
+
+
+def _write_scripts(ir: AgentIR, skill_dir: Path) -> List[str]:
+    """把源 skill 的 scripts/ 原样拷进 <skill_dir>/scripts/,返回相对路径列表。
+
+    Agent Skills 规范里 scripts/ 是技能的执行资源层,skill 目录形态的
+    产物必须原样保留(否则 docx 这类脚本型技能能力直接减半)。源目录
+    取 ir.metadata["source_path"](load_skill 填写),逐条按 ir.scripts
+    相对路径拷贝;源缺失或路径越界(含 ..)跳过。非 skill 源(无
+    source_path)时安静跳过 —— 此时 IR 本就没带脚本内容。
+    """
+    source = (ir.metadata or {}).get("source_path") or ""
+    copied: List[str] = []
+    if not source or not ir.scripts:
+        return copied
+    src_root = Path(source)
+    for rel in ir.scripts:
+        rel = (rel or "").strip()
+        if not rel or ".." in Path(rel).parts:
+            continue
+        src = src_root / rel
+        if not src.is_file():
+            continue
+        dst = skill_dir / rel
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes(src.read_bytes())
+        copied.append(rel)
+    return copied
 
 
 # ---------- YAML 生成(手写,不经 pyyaml) ----------

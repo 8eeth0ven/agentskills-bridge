@@ -22,6 +22,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from converter.ir import AgentIR
+from converter.emitters.crewai_skills import _write_scripts
 
 MODEL = "anthropic:claude-sonnet-4-6"
 
@@ -34,6 +35,7 @@ def emit_deepagents(ir: AgentIR, out_dir: str | Path) -> Path:
     skill_dir = out / "skills" / name
     skill_dir.mkdir(parents=True, exist_ok=True)
     written = _write_references(ir, skill_dir, name)
+    _write_scripts(ir, skill_dir)
     (skill_dir / "SKILL.md").write_text(_skill_md(ir, name), encoding="utf-8")
     (out / "agent.py").write_text(_agent_py(ir, name, written), encoding="utf-8")
     (out / "requirements.txt").write_text(_requirements(), encoding="utf-8")

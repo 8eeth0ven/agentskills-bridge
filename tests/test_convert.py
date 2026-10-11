@@ -554,5 +554,54 @@ class TestSkillWriterValidation(unittest.TestCase):
         self.assertTrue(desc.strip(), "空白 description 应有非空兜底")
 
 
+class TestScriptsMigration(unittest.TestCase):
+    """scripts/ 在 skill 目录形态 target(crewai-skills/deepagents)必须原样迁移。
+
+    该缺陷由能力对照矩阵钉出:早期版本只迁 SKILL.md + references,anthropics
+    docx skill 的 59 个脚本文件全部丢失。
+    """
+
+    def test_scripts_copied_to_skill_dir_targets(self):
+        try:
+            from converter.emitters import EMITTERS
+            from converter.skill_loader import load_skill
+        except Exception:
+            self.skipTest("emitters/skill_loader not available yet")
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            src = tmp_path / "src-skill"
+            (src / "scripts" / "office").mkdir(parents=True)
+            (src / "SKILL.md").write_text(
+                "---\nname: scripted-skill\ndescription: A skill with scripts.\n---\n\nBody.\n",
+                encoding="utf-8",
+            )
+            (src / "scripts" / "run.py").write_text("print('run')\n", encoding="utf-8")
+            (src / "scripts" / "office" / "util.py").write_text("X = 1\n", encoding="utf-8")
+            ir = load_skill(src)
+            self.assertEqual(len(ir.scripts), 2, "load_skill 应登记 2 个 scripts 相对路径")
+            for fmt in ("crewai-skills", "deepagents"):
+                if fmt not in EMITTERS:
+                    continue
+                out = tmp_path / f"out-{fmt}"
+                EMITTERS[fmt](ir, out)
+                skill_dir = next((out / "skills").iterdir())
+                copied = sorted(
+                    str(p.relative_to(skill_dir)) for p in (skill_dir / "scripts").rglob("*") if p.is_file()
+                )
+                self.assertEqual(copied, ["scripts/office/util.py", "scripts/run.py"], f"{fmt} 应原样迁移 scripts/")
+                content = (skill_dir / "scripts" / "run.py").read_text(encoding="utf-8")
+                self.assertEqual(content, "print('run')\n", f"{fmt} 迁移内容应逐字节一致")
+
+    def test_scripts_skipped_when_source_missing(self):
+        """无 source_path(内存 IR)时安静跳过,不抛错。"""
+        from converter.emitters.crewai_skills import _write_scripts
+        from converter.ir import AgentIR
+
+        ir = AgentIR(name="x", scripts=["scripts/run.py"])  # 无 metadata.source_path
+        with tempfile.TemporaryDirectory() as tmp:
+            copied = _write_scripts(ir, Path(tmp))
+        self.assertEqual(copied, [])
+
+
 if __name__ == "__main__":
     unittest.main()
