@@ -4,7 +4,7 @@
 
 ## 环境
 
-Python ≥3.9,零强制依赖。clone 后直接:
+Python ≥3.10,零强制依赖。clone 后直接:
 
 ```bash
 python3 -m unittest discover tests    # 70 用例应全绿

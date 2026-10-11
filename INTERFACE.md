@@ -58,7 +58,7 @@ target 名 `openai` → emitters.openai_agents;`--from` 名对应 parsers。
 
 ## 通用要求
 
-- Python ≥3.9,零强制第三方依赖(pyyaml 可用时优先用,不可用时走内置路径)。
+- Python ≥3.10,零强制第三方依赖(pyyaml 可用时优先用,不可用时走内置路径)。
 - 所有文件 UTF-8,函数带 docstring,不 print 噪音(返回值说话)。
 - 不得修改 converter/ir.py、llm-wiki/、cli.py(主线程所有)。
 - 子模块内部可自由加 helper,但上述公开函数签名不可变。
