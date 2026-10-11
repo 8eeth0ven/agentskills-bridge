@@ -37,6 +37,7 @@ from .langchain import (
     _params_from_schema,
     _py_triple,
     _safe_filename,
+    _tool_docstring,
     _write_knowledge,
 )
 
@@ -282,7 +283,11 @@ def _main_section() -> str:
 def _tool_stub(tool: ToolSpec) -> str:
     ident = _identifier(tool.name, "tool")
     params, _ = _params_from_schema(tool.input_schema)
-    doc = (tool.description or f"工具 {tool.name or ident} 的 stub。").strip()
+    doc = _tool_docstring(
+        (tool.description or f"工具 {tool.name or ident} 的 stub。").strip(),
+        tool.input_schema,
+        tool.side_effects,
+    )
     return (
         f"async def {ident}({params}) -> str:\n"
         f"    {_py_triple(doc)}\n"

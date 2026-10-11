@@ -207,6 +207,27 @@ class WorkflowIR:
             WorkflowEdge(source=nodes[i].id, target=nodes[i + 1].id)
             for i in range(len(nodes) - 1)
         ]
+        # 分支拓扑优先(parser 保留的 graph_edges):端点能对上节点 id 或
+        # name 的边按原图覆盖线性链(端点是 n8n 节点名时翻译成 id)——
+        # n8n 与 mermaid 两个 workflow emitter 都消费 w.edges,分支 DAG
+        # 在两种格式里同时持久化(语义审计 P2 的 WIR 层收口)。
+        graph_edges = (ir.metadata or {}).get("graph_edges")
+        if isinstance(graph_edges, list):
+            id_by_key: Dict[str, str] = {}
+            for n in nodes:
+                id_by_key.setdefault(n.id, n.id)
+                if n.name:
+                    id_by_key.setdefault(n.name, n.id)
+            mapped = []
+            for e in graph_edges:
+                if not (isinstance(e, list) and len(e) == 2):
+                    continue
+                src = id_by_key.get(str(e[0]))
+                tgt = id_by_key.get(str(e[1]))
+                if src and tgt and src != tgt:
+                    mapped.append(WorkflowEdge(source=src, target=tgt))
+            if mapped:
+                edges = mapped
         metadata = dict(ir.metadata)
         metadata["_workflow"] = True
         if steps:

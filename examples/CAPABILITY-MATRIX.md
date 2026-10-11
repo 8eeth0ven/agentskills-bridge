@@ -41,5 +41,5 @@ skill 侧能力转换到 11 种目标形态(9 种 agent 形态 + n8n / mermaid-w
 
 - **skill 目录形态(crewai-skills / deepagents)是能力无损通道**:scripts、渐进披露、agentskills.io 合规全部原生保留 —— 脚本型技能(如 docx/pdf)优先选这两个 target;
 - **scripts/ 在其余 7 个 target 不随迁移**是有意的:那些形态没有可执行脚本的挂载点(如 flow.json、subagent 定义);IR 保留 `scripts` 路径名单,`write_skill(copy_scripts_from=...)` 回程可恢复;
-- **input_schema 仅 generic 完整保留**,其余 target 保留工具名与描述 —— 全链路 schema 往返在 Roadmap;
+- **input_schema 往返**:langchain / autogen / deepagents(继承 langchain)三链已支持字典级往返 + side_effects 回读(2026-10-11 补);generic 仍为唯一全 schema 格式,其余 target 保留工具名与描述;
 - **n8n 的 tools / 凭据节点不自动生成**:工具契约留在 IR,AI Agent 节点的 tool 子节点与凭据需人工在 n8n 界面补挂;mermaid-workflow 为纯文本格式,无工具挂载点。

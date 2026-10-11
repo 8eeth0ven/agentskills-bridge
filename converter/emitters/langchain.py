@@ -179,7 +179,11 @@ def _main_section() -> str:
 def _tool_stub(tool: ToolSpec) -> str:
     ident = _identifier(tool.name, "tool")
     params, _ = _params_from_schema(tool.input_schema)
-    doc = (tool.description or f"工具 {tool.name or ident} 的 stub。").strip()
+    doc = _tool_docstring(
+        (tool.description or f"工具 {tool.name or ident} 的 stub。").strip(),
+        tool.input_schema,
+        tool.side_effects,
+    )
     return (
         "@tool\n"
         f"def {ident}({params}) -> str:\n"
@@ -187,6 +191,24 @@ def _tool_stub(tool: ToolSpec) -> str:
         "    # TODO(stub): 按 input_schema 接入真实实现,替换下面的占位返回。\n"
         f'    return "[stub] {ident} 尚未接入真实实现"\n'
     )
+
+
+def _tool_docstring(description: str, input_schema: dict, side_effects: bool) -> str:
+    """工具 stub 的 docstring:首段 = description,随后元数据行。
+
+    - `schema: {单行 JSON}` —— ToolSpec.input_schema(JSON Schema)原文,
+      parse 侧(parsers/langchain._tool_meta_from_docstring)按行正则提取后
+      json.loads 还原,完成 input_schema 往返;
+    - `side-effects: true|false` —— ToolSpec.side_effects 布尔原文回读。
+
+    JSON 由 json.dumps 单行化,不会出现裸的三连双引号序列(字符串值内的
+    引号一律 \\" 转义),可安全嵌进三引号 docstring。
+    """
+    lines = [description]
+    if input_schema:
+        lines += ["", f"    schema: {json.dumps(input_schema, ensure_ascii=False)}"]
+    lines += ["", f"    side-effects: {'true' if side_effects else 'false'}"]
+    return "\n".join(lines)
 
 
 def _params_from_schema(schema: dict) -> Tuple[str, bool]:

@@ -3,14 +3,18 @@
 提取目标:
     SYSTEM_PROMPT / system_prompt / SYSTEM_MESSAGE 三引号常量 → system_prompt
     @tool 装饰函数名 / StructuredTool(name=...) → ToolSpec(docstring 首段)
+        docstring 内的 `schema: {单行 JSON}` / `side-effects: true|false`
+        元数据行 → ToolSpec.input_schema / side_effects(emitter 侧
+        _tool_docstring 的落点;没有元数据行时保持 name+description 现状)
 找不到 prompt 常量时回退:全文第一个 >50 字符的三引号字符串。
 """
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 try:
     from converter.ir import AgentIR, ToolSpec, slugify
@@ -34,6 +38,12 @@ _TOOL_DEF_RE = re.compile(
 _STRUCTURED_TOOL_RE = re.compile(r"StructuredTool\s*\(")
 _KV_NAME_RE = re.compile(r"\bname\s*=\s*[\"']([^\"']+)[\"']")
 _KV_DESC_RE = re.compile(r"\bdescription\s*=\s*[\"']([^\"']*)[\"']")
+# 工具 docstring 内的元数据行(与 emitters/langchain._tool_docstring 对应):
+# schema 行是单行 JSON;side-effects 行是 true|false 字面量。
+_TOOL_SCHEMA_LINE_RE = re.compile(r"^[ \t]*schema:[ \t]*(\{.*\})[ \t]*$", re.MULTILINE)
+_TOOL_SIDEEFFECT_LINE_RE = re.compile(
+    r"^[ \t]*side-effects:[ \t]*(true|false)[ \t]*$", re.MULTILINE
+)
 
 
 def _first_paragraph(text: str) -> str:
@@ -77,6 +87,33 @@ def _extract_system_prompt(text: str) -> str:
     return ""
 
 
+def _docstring_value(raw: str, delim: str) -> str:
+    """docstring 源码捕获组 → 运行时值(经 _literal_eval 还原转义)。"""
+    if not raw:
+        return ""
+    return _literal_eval(raw, delim)
+
+
+def _tool_meta_from_docstring(doc_value: str) -> Tuple[Dict[str, Any], bool]:
+    """从 docstring 运行时值提取 schema:/side-effects: 元数据行。
+
+    与 emitters/langchain._tool_docstring 互逆:返回 (input_schema,
+    side_effects);没有对应行时 schema 为空 dict、side_effects 为 False,
+    即 name-only 工具保持现状。JSON 非法时同样按缺省处理(best-effort)。
+    """
+    schema: Dict[str, Any] = {}
+    m = _TOOL_SCHEMA_LINE_RE.search(doc_value or "")
+    if m:
+        try:
+            loaded = json.loads(m.group(1))
+        except ValueError:
+            loaded = None
+        if isinstance(loaded, dict):
+            schema = loaded
+    se = _TOOL_SIDEEFFECT_LINE_RE.search(doc_value or "")
+    return schema, bool(se and se.group(1) == "true")
+
+
 def _extract_tools(text: str) -> List[ToolSpec]:
     """@tool 装饰函数 + StructuredTool(name=...) → ToolSpec(按名去重)。"""
     tools: List[ToolSpec] = []
@@ -88,11 +125,19 @@ def _extract_tools(text: str) -> List[ToolSpec]:
             continue
         doc = re.search(r"\"\"\"(.*?)\"\"\"|'''(.*?)'''", text[m.end(): m.end() + 2000], re.DOTALL)
         desc = ""
+        schema: Dict[str, Any] = {}
+        side_effects = False
         if doc:
-            raw = doc.group(1) if doc.group(1) is not None else doc.group(2)
-            desc = _first_paragraph(raw or "")
+            if doc.group(1) is not None:
+                value = _docstring_value(doc.group(1), '"""')
+            else:
+                value = _docstring_value(doc.group(2), "'''")
+            desc = _first_paragraph(value)
+            schema, side_effects = _tool_meta_from_docstring(value)
         seen.add(name)
-        tools.append(ToolSpec(name=name, description=desc))
+        tools.append(
+            ToolSpec(name=name, description=desc, input_schema=schema, side_effects=side_effects)
+        )
 
     for m in _STRUCTURED_TOOL_RE.finditer(text):
         window = text[m.end(): m.end() + 800]

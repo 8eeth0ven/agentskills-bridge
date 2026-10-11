@@ -140,6 +140,12 @@ def parse_mermaid_workflow(path: Union[str, Path]) -> AgentIR:
             f"{src} -> {tgt}" + (f" [{label}]" if label else "")
             for src, tgt, label in edges
         ]
+        # graph_edges:图里读出的边表恒持久化(分支拓扑靠它才能往返;
+        # 线性链时重建结果与顺序串联等价,无信息损失)。后续再转
+        # n8n/mermaid 时按原图重建而非线性链(与 parse_n8n 对齐,P2)。
+        metadata["graph_edges"] = [
+            [src, tgt] for src, tgt, _ in edges
+        ]
 
     return AgentIR(
         name=name,

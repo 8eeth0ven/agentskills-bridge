@@ -21,11 +21,19 @@ from typing import List, Optional, Union
 try:
     from converter.ir import AgentIR, ToolSpec, slugify
     from converter.parsers.knowledge import collect_knowledge
-    from converter.parsers.langchain import _extract_system_prompt, _literal_eval
+    from converter.parsers.langchain import (
+        _extract_system_prompt,
+        _literal_eval,
+        _tool_meta_from_docstring,
+    )
 except ImportError:  # pragma: no cover - 包内相对导入兜底
     from ..ir import AgentIR, ToolSpec, slugify  # type: ignore
     from .knowledge import collect_knowledge  # type: ignore
-    from .langchain import _extract_system_prompt, _literal_eval  # type: ignore
+    from .langchain import (  # type: ignore
+        _extract_system_prompt,
+        _literal_eval,
+        _tool_meta_from_docstring,
+    )
 
 _AGENT_NAME_CONST_RE = re.compile(r"\bAGENT_NAME\s*=\s*[\"']([^\"'\n]+)[\"']")
 _SKILL_DESC_CONST_RE = re.compile(r"\bSKILL_DESCRIPTION\s*=\s*[\"']([^\"'\n]+)[\"']")
@@ -74,7 +82,12 @@ def _extract_system_message(text: str) -> str:
 
 
 def _extract_tools(text: str) -> List[ToolSpec]:
-    """TOOLS = [fn, ...] 清单里的函数 → ToolSpec(docstring 首段,按名去重)。"""
+    """TOOLS = [fn, ...] 清单里的函数 → ToolSpec(docstring 首段,按名去重)。
+
+    docstring 内 `schema: {单行 JSON}` / `side-effects: true|false` 元数据行
+    → ToolSpec.input_schema / side_effects(与 langchain parser 同构);没有
+    元数据行时保持 name+description 现状。
+    """
     m = _TOOLS_LIST_RE.search(text)
     if not m:
         return []
@@ -89,10 +102,21 @@ def _extract_tools(text: str) -> List[ToolSpec]:
         if def_m is None:
             continue
         doc = _DOCSTRING_RE.search(text[def_m.end(): def_m.end() + 2000])
-        raw = ""
+        value = ""
         if doc:
-            raw = doc.group(1) if doc.group(1) is not None else doc.group(2)
-        tools.append(ToolSpec(name=ident, description=_first_paragraph(raw or "")))
+            if doc.group(1) is not None:
+                value = _literal_eval(doc.group(1), '"""') if doc.group(1) else ""
+            elif doc.group(2):
+                value = _literal_eval(doc.group(2), "'''")
+        schema, side_effects = _tool_meta_from_docstring(value)
+        tools.append(
+            ToolSpec(
+                name=ident,
+                description=_first_paragraph(value),
+                input_schema=schema,
+                side_effects=side_effects,
+            )
+        )
     return tools
 
 
