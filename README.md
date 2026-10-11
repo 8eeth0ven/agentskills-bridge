@@ -60,6 +60,8 @@ python3 cli.py ir examples/agent-fullcycle-engineering --out out/ir.json
 python3 cli.py wiki list && python3 cli.py wiki read 03-frameworks/crewai.md
 ```
 
+想先看输入→输出长什么样?四个真实转换案例(正向 / 第三方 CrewAI 项目反向 / Langflow 官方 flow 反向 / roundtrip 哈希保真)见 [examples/SHOWCASE.md](examples/SHOWCASE.md)。
+
 ## 测试与评测
 
 完整报告:[evaluation/REPORT.md](evaluation/REPORT.md)。全部可复现。
@@ -116,6 +118,8 @@ Agent Skills 已成为跨厂商开放规范,本项目专注「skill ⇄ 框架�
 - **互操作标准**:[AGNTCY OASF](https://github.com/agntcy/oasf) · A2A 协议
 
 上游灵感:[8eeth0ven/CrewAI-AgentCodingSkills](https://github.com/8eeth0ven/CrewAI-AgentCodingSkills)。
+
+欢迎 Issue / Discussion / PR(中英文都可以)——新增一个框架只需一对 emitter/parser 函数,最小路径见 [CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## License
 
