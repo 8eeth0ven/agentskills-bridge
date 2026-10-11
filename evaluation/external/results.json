@@ -1,0 +1,594 @@
+{
+  "meta": {
+    "run_date": "2026-10-11",
+    "design": "外部真实 corpus 泛化测试:输入全部来自第三方仓库,非本项目 emitter 产物",
+    "sources": {
+      "crewai": "github.com/crewAIInc/crewAI-examples(4 项目)",
+      "skills": "github.com/anthropics/skills(docx/pdf/pptx)",
+      "langflow": "github.com/langflow-ai/langflow 官方 fixtures(3×v1.9.0 + 1×v1.6.0 无 Prompt)",
+      "claude-subagents": "github.com/wshobson/agents(3 个真实 .claude 形态 subagent)"
+    },
+    "emitter_keys": [
+      "claude-subagent",
+      "crewai",
+      "crewai-skills",
+      "deepagents",
+      "generic",
+      "langchain",
+      "langflow",
+      "openai"
+    ],
+    "parser_keys": [
+      "claude-subagent",
+      "crewai",
+      "crewai-skills",
+      "deepagents",
+      "generic",
+      "langchain",
+      "langflow",
+      "openai"
+    ],
+    "compat_notes": [
+      {
+        "found": "crewai: 真实项目模板路径是 src/<pkg>/config/agents.yaml 且包名 ≠ 项目目录名(game-builder-crew → src/game_builder_crew/config/),原探测只到 src/config/",
+        "fix": "crewai.py _candidates 增加 sorted((root/src).glob('*/config/agents.yaml')) 兜底;首跑 4/4 项目 FileNotFoundError,修后 4/4 通过"
+      },
+      {
+        "found": "crewai: 多 agent 文件(真实项目每文件 3-4 个 agent)",
+        "fix": "parse_crewai 仍取第一个,metadata 新增 agents_all(全部 agent 名)+ agents_count,不静默丢弃(首跑后已验证 marketing_strategy 4 agent 全记录)"
+      },
+      {
+        "found": "crewai: agents.yaml 未知字段(llm:/tools:/knowledge_sources: 等;真实仓库当前仅 role/goal/backstory,防御性兼容)、> 折叠块内带引号与 {var} 占位(landing_page_generator)",
+        "fix": "白名单 agent.get 取值,未知字段静默忽略(原有行为,保持);pyyaml 天然支持折叠块,_minimal_yaml_load 容错路径不变"
+      },
+      {
+        "found": "langflow: 无 Prompt 节点的 Agent flow(官方 starter \"Pokédex Agent\"@1.6.0,system_prompt 在 Agent 组件 template.system_prompt.value)",
+        "fix": "_extract_system_prompt 新增优先级③ Agent 组件 system_prompt(≥20 字符);原模糊回退(>50 字符)降为④;新增⑤ Note 组件文本兜底(noteNode)"
+      },
+      {
+        "found": "langflow: 1.9+ LLM 组件 model_name 是覆盖名常为空,模型在 model 字段(ModelInput)",
+        "fix": "_extract_model 每键依次尝试 model_name → model,取第一个非空 value"
+      },
+      {
+        "found": "claude-subagent: tools 为行内逗号串或单值(eval-judge.md `tools: Read, Grep, Glob`;image-generator.md `tools: mcp__meigen__generate_image`),原解析只得 []",
+        "fix": "_parse_tools_list 增加行内无方括号分支(逗号切分 + 单值),修后 tools=3 / tools=1"
+      },
+      {
+        "found": "claude-subagent: description 用 >- 折叠块(image-generator.md),ir.parse_frontmatter 把块标记拼进值形成 \">- \" 脏前缀",
+        "fix": "claude_subagent.py 新增 _clean_scalar 剥离块标量前缀(|/>/-/|-/+/数字指示符);ir.py 按契约不可改,在 parser 层修"
+      },
+      {
+        "found": "claude-subagent: 双引号标量值内含 \\\" 转义(anthropics/skills pptx 的 description 含 \\\"deck,\\\" \\\"slides,\\\"),parser 不做 YAML 反转义,每过一轮 emitter→parser 漂移一层(\\\" → \\\\\\\"),F_desc=0.9840",
+        "fix": "_clean_scalar 叠加 _yaml_unescape(\\\\ → \\、\\\" → \"、\\n → 换行,单趟扫描);修后该链 F_desc 0.9840 → 1.0000,四链 12/12 满分"
+      },
+      {
+        "found": "claude-subagent: frontmatter 额外键(color: magenta 等)与缺失可选键(backend-architect.md 无 tools)",
+        "fix": "平面提取天然容忍:额外键忽略、缺失键空值,不崩(原有行为,保持)"
+      }
+    ]
+  },
+  "agent_to_skill": [
+    {
+      "input": "game-builder-crew",
+      "format": "crewai",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "senior-engineer-agent",
+      "display_name": "Senior Engineer Agent",
+      "desc_len": 25,
+      "system_prompt_len": 256,
+      "tasks": 3,
+      "knowledge": 0,
+      "agents_all": [
+        "senior_engineer_agent",
+        "qa_engineer_agent",
+        "chief_qa_engineer_agent"
+      ],
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "landing_page_generator",
+      "format": "crewai",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "senior-idea-analyst",
+      "display_name": "Senior Idea Analyst",
+      "desc_len": 132,
+      "system_prompt_len": 319,
+      "tasks": 7,
+      "knowledge": 0,
+      "agents_all": [
+        "senior_idea_analyst",
+        "senior_strategist",
+        "senior_react_engineer",
+        "senior_content_editor"
+      ],
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "marketing_strategy",
+      "format": "crewai",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "lead-market-analyst",
+      "display_name": "Lead Market Analyst",
+      "desc_len": 116,
+      "system_prompt_len": 311,
+      "tasks": 5,
+      "knowledge": 0,
+      "agents_all": [
+        "lead_market_analyst",
+        "chief_marketing_strategist",
+        "creative_content_creator",
+        "chief_creative_director"
+      ],
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "recruitment",
+      "format": "crewai",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "researcher",
+      "display_name": "Researcher",
+      "desc_len": 37,
+      "system_prompt_len": 294,
+      "tasks": 4,
+      "knowledge": 0,
+      "agents_all": [
+        "researcher",
+        "matcher",
+        "communicator",
+        "reporter"
+      ],
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "basic_prompting@1.9.0",
+      "format": "langflow",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "basic-prompting",
+      "display_name": "Basic Prompting",
+      "desc_len": 45,
+      "system_prompt_len": 116,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "research_agent@1.9.0",
+      "format": "langflow",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "research-agent",
+      "display_name": "Research Agent",
+      "desc_len": 111,
+      "system_prompt_len": 461,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "meeting_summary@1.9.0",
+      "format": "langflow",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "meeting-summary",
+      "display_name": "Meeting Summary",
+      "desc_len": 129,
+      "system_prompt_len": 131,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "pokedex_agent@1.6.0",
+      "format": "langflow",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "pok-dex-agent",
+      "display_name": "Pokédex Agent",
+      "desc_len": 62,
+      "system_prompt_len": 260,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "backend-architect",
+      "format": "claude-subagent",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "backend-development-backend-architect",
+      "display_name": "Backend Development Backend Architect",
+      "desc_len": 394,
+      "system_prompt_len": 17879,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 0
+    },
+    {
+      "input": "eval-judge",
+      "format": "claude-subagent",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "eval-judge",
+      "display_name": "Eval Judge",
+      "desc_len": 163,
+      "system_prompt_len": 2808,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 3
+    },
+    {
+      "input": "image-generator",
+      "format": "claude-subagent",
+      "exists": true,
+      "parse_ok": true,
+      "error": null,
+      "name": "image-generator",
+      "display_name": "Image Generator",
+      "desc_len": 204,
+      "system_prompt_len": 1884,
+      "tasks": 0,
+      "knowledge": 0,
+      "agents_all": null,
+      "write_load_ok": true,
+      "write_load_error": null,
+      "tools": 1
+    }
+  ],
+  "skill_to_agent_forward": [
+    {
+      "skill": "docx",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "docx",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pdf",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "skill": "pptx",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    }
+  ],
+  "skill_to_agent_back": [
+    {
+      "skill": "docx",
+      "target": "crewai",
+      "chain": "crewai",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "docx",
+      "target": "langflow",
+      "chain": "langflow",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "docx",
+      "target": "claude-subagent",
+      "chain": "claude-subagent",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "docx",
+      "target": "generic",
+      "chain": "generic",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pdf",
+      "target": "crewai",
+      "chain": "crewai",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pdf",
+      "target": "langflow",
+      "chain": "langflow",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pdf",
+      "target": "claude-subagent",
+      "chain": "claude-subagent",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pdf",
+      "target": "generic",
+      "chain": "generic",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pptx",
+      "target": "crewai",
+      "chain": "crewai",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pptx",
+      "target": "langflow",
+      "chain": "langflow",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pptx",
+      "target": "claude-subagent",
+      "chain": "claude-subagent",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    },
+    {
+      "skill": "pptx",
+      "target": "generic",
+      "chain": "generic",
+      "status": "ok",
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "error": null
+    }
+  ]
+}

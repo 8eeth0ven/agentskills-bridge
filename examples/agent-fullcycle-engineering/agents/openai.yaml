@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Fullcycle Engineering"
+  short_description: "Build agents with delegation and adaptive optimization"
+  default_prompt: "Use $agent-fullcycle-engineering to design, delegate, build, test, observe, deploy, and adaptively optimize an AI agent from requirements to release."

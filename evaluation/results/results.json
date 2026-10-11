@@ -1,0 +1,764 @@
+{
+  "meta": {
+    "run_date": "2026-10-11",
+    "matrix": {
+      "corpora": [
+        "S1_real",
+        "S2_cn",
+        "S3_min"
+      ],
+      "targets": [
+        "crewai",
+        "crewai-skills",
+        "deepagents",
+        "langchain",
+        "langflow",
+        "openai",
+        "claude-subagent",
+        "generic",
+        "autogen"
+      ]
+    },
+    "corpus_notes": {},
+    "corpus_files": {
+      "S2_cn/SKILL.md": "unchanged",
+      "S2_cn/references/cn-glossary.md": "unchanged",
+      "S2_cn/references/cn-playbook.md": "unchanged",
+      "S2_cn/agents/openai.yaml": "unchanged",
+      "S3_min/SKILL.md": "unchanged"
+    },
+    "parsers_available": [
+      "autogen",
+      "claude-subagent",
+      "crewai",
+      "crewai-skills",
+      "deepagents",
+      "generic",
+      "langchain",
+      "langflow",
+      "openai"
+    ],
+    "emitters_available": [
+      "autogen",
+      "claude-subagent",
+      "crewai",
+      "crewai-skills",
+      "deepagents",
+      "generic",
+      "langchain",
+      "langflow",
+      "openai"
+    ],
+    "metrics_formulas": {
+      "F_name": "slugify(name) 相等 → 1.0/0.0",
+      "F_desc": "归一(strip+换行→空格)相等 → 1.0,否则 1 - levenshtein/max(len)",
+      "F_prompt": "归一(strip+\\r\\n→\\n)相等 → 1.0,否则 1 - levenshtein/max(len)",
+      "F_know_q": "len(out.knowledge)/len(in.knowledge),in=0 → 1.0",
+      "F_know_c": "sha256 内容一致的 knowledge 数/len(in.knowledge),in=0 → 1.0",
+      "V_format": "forward 产物静态校验,通过=1 否则=0(附原因)"
+    }
+  },
+  "forward": [
+    {
+      "corpus": "S1_real",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "autogen",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "autogen",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "crewai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "crewai-skills",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "deepagents",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "langchain",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "langflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "openai",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "claude-subagent",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "generic",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "autogen",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    }
+  ],
+  "roundtrip": [
+    {
+      "corpus": "S1_real",
+      "target": "crewai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "crewai-skills",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "deepagents",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "langchain",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "langflow",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "openai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "claude-subagent",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "generic",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "autogen",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "crewai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "crewai-skills",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "deepagents",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "langchain",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "langflow",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "openai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "claude-subagent",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "generic",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "autogen",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "crewai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "crewai-skills",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "deepagents",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "langchain",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "langflow",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "openai",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "claude-subagent",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "generic",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "autogen",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    }
+  ],
+  "summary": {
+    "per_target": {
+      "crewai": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "crewai-skills": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "deepagents": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "langchain": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "langflow": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "openai": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "claude-subagent": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "generic": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "autogen": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      }
+    },
+    "global": {
+      "F_name": 1.0,
+      "F_desc": 1.0,
+      "F_prompt": 1.0,
+      "F_know_q": 1.0,
+      "F_know_c": 1.0,
+      "V_format": 1.0,
+      "roundtrip_samples": 27,
+      "forward_samples": 27
+    },
+    "loss_freq": []
+  }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "CN Agent Onboarding"
+  short_description: "中文团队的 Agent 上手指南(环境、提示词、评测)"
+  default_prompt: "请按「三步走」带我完成第一周,并引用术语表解释“黄金集”"
