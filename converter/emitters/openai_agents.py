@@ -11,6 +11,7 @@ openai.yaml 手写生成(不依赖 pyyaml),标量一律安全双引号包裹。
 
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import List, Optional
 
@@ -46,6 +47,9 @@ def _openai_yaml(ir: AgentIR) -> str:
     default = (ir.default_prompt or "").strip() or _default_prompt(ir, short)
     # x-source-skill: 转换器私有扩展(x- 前缀命名空间,Codex 宽容忽略),
     # 携带全文 description 保证 roundtrip;parse_openai 优先读取。
+    # tools 键(单行 JSON 数组,JSON 流式序列本身是合法 YAML)携带工具
+    # 契约 {name,description,input_schema,side_effects},与 n8n 的
+    # x-source-skill.tools 同构 —— openai 形态不丢工具 schema。
     full_desc = " ".join((ir.description or "").split())
     lines = [
         "interface:",
@@ -56,6 +60,11 @@ def _openai_yaml(ir: AgentIR) -> str:
         f"  name: {_yaml_str(ir.name)}",
         f"  description: {_yaml_str(full_desc or short)}",
     ]
+    if ir.tools:
+        compact = json.dumps(
+            [t.to_dict() for t in ir.tools], ensure_ascii=False, separators=(",", ":")
+        )
+        lines.append(f"  tools: {compact}")
     return "\n".join(lines) + "\n"
 
 

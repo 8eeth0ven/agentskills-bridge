@@ -76,7 +76,9 @@ agentskills-bridge 覆盖 **skill(声明式知识包)/ agent(可执行运行时�
 
 - **无损通道 = crewai-skills / deepagents**:scripts(实测 docx 59/59)、渐进披露、agentskills.io 合规全部原生保留——脚本型技能(docx / pdf / pptx)优先选这两个 target。
 - **scripts/ 只在 skill 目录形态随迁**:其余 target 不迁是有意的(无执行脚本挂载点),IR 保留路径名单,`write_skill(copy_scripts_from=...)` 回程可恢复。
-- **input_schema 当前实际**:仅 generic 完整保留并往返;langchain/autogen 见 `tests/test_tool_schema_roundtrip.py`(本轮新增) `langchain/autogen/deepagents 三链已支持 input_schema 字典级往返 + side_effects 回读(tests/test_tool_schema_roundtrip.py);其余格式仍 name-only,.generic 仍为唯一全 schema 格式。`;其余 target 保留工具名 + 描述。
+- **input_schema 往返(2026-10-11 第二轮后)**:**8/11 格式**支持字典级 schema 往返 + side_effects 回读——generic(全 schema)、langchain / autogen / deepagents(@tool docstring `schema:` 行)、skill / crewai-skills / deepagents(frontmatter metadata `tools` 键)、openai / n8n(x-source-skill `tools` 键)、claude-subagent(`x-tools:` 扩展键);agent→skill 反向 tools 被静默丢弃的隐性缺陷同步修复。其余 3 格式(crewai YAML / langflow / mermaid)无 schema 挂载点,保留工具名。
+- **workflow 角色语义(2026-10-11 第二轮后)**:多 agent crewai → workflow 的角色对齐从按序启发式升级为**词袋 Jaccard 贪心最优分配**(错位场景实测 0/3 → 3/3),对齐方式记录于 `metadata.role_alignment`(explicit / text-match / positional / none)。
+- **langflow 真实引擎验证(2026-10-11 第二轮后)**:langflow 1.12.5 引擎 `load_flow_from_json` 真实加载产物,4 组件实例化 4/4,Prompt 模板经引擎往返与 system_prompt **逐字一致**;顺带修复 2 个产物 bug(template.code 缺失、ChatInput field_order)。`evaluation/runtime/test_langflow_runtime.py`。
 - **n8n / mermaid 的 tools 与凭据节点不自动生成**:AI Agent 节点的 tool 子节点与凭据需人工在 n8n 界面补挂;mermaid 为纯文本格式,无工具挂载点。
 - **渐进披露三级**:crewai / crewai-skills(CrewAI 三级原生)、deepagents(SkillsMiddleware 三级);langchain / openai 等为常量全量进上下文,无自动按需读。
 
@@ -87,7 +89,7 @@ agentskills-bridge 覆盖 **skill(声明式知识包)/ agent(可执行运行时�
 **语义验证层**(`llm-wiki/05-evaluation/semantic-equivalence.md` §局限):
 
 - L3 依赖真实 LLM,temperature 0.2 仍有随机性,同题重跑一致率会波动(90% 阈值留余量但不消除方差);
-- 探针覆盖有限:当前已记录结果为单轮短题(5 题),长上下文与多轮对话场景下的行为漂移未系统覆盖;
+- 探针覆盖:已扩至 8 题 + 1 道两轮追问(2026-10-11 第二轮,17/17 一致),长上下文场景仍未系统覆盖;
 - L2 术语表是启发式:五类 token 之外的语义载体(隐喻、语气强弱)不在统计内,专有名词识别可能漏类;
 - 行为等价 ≠ 输出逐字等价:L3 判回答语义一致,与字符级 F 指标口径互补而非替代。
 

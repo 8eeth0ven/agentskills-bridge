@@ -87,6 +87,10 @@ def _frontmatter_metadata(ir) -> dict:
     排除:本机绝对路径(source_path)与下划线私有键;保留拓扑/角色等
     语义键(graph_edges / agents / agents_all / agents_count /
     steps_extracted / model / source_format)。值不可 JSON 序列化时跳过。
+
+    另把 ir.tools 序列化为 ``tools`` 键([{name,description,input_schema,
+    side_effects}] 列表)—— 修复 agent→skill 反向时 tools 契约被静默丢弃
+    的缺陷;input_schema 再大也只是单行 JSON 变长,frontmatter 仍合法。
     """
     keep = ("graph_edges", "agents", "agents_all", "agents_count",
             "steps_extracted", "model", "source_format", "chain")
@@ -98,6 +102,14 @@ def _frontmatter_metadata(ir) -> dict:
                 out[key] = ir.metadata[key]
             except (TypeError, ValueError):
                 continue
+    tools = list(getattr(ir, "tools", None) or [])
+    if tools:
+        try:
+            payload = [t.to_dict() for t in tools]
+            json.dumps(payload)
+            out["tools"] = payload
+        except (TypeError, ValueError):
+            pass
     return out
 
 
@@ -119,8 +131,9 @@ def write_skill(
     # SKILL.md:frontmatter + system_prompt 正文
     # frontmatter 先按 agentskills.io 开放规范规范化(name kebab ≤64、
     # description 非空 ≤1024),再拼正文。metadata 键是规范允许的扩展对象:
-    # 单行 JSON 序列化 ir.metadata 的可保留子集(graph_edges 等),让分支
-    # DAG 等拓扑信息经 skill 形态中转不丢(语义审计 P2 的 skill 侧补全)。
+    # 单行 JSON 序列化 ir.metadata 的可保留子集(graph_edges 等)+ ir.tools
+    # 契约(tools 键),让分支 DAG 拓扑与工具 input_schema 经 skill 形态
+    # 中转不丢(语义审计 P2 的 skill 侧补全)。
     name = _normalize_skill_name(ir.name)
     desc = _normalize_skill_description(ir)
     metadata = _frontmatter_metadata(ir)

@@ -103,6 +103,21 @@ def _tools_block(ir: AgentIR) -> str:
     return "\n".join(lines) + "\n"
 
 
+def _x_tools_line(ir: AgentIR) -> str:
+    """工具契约扩展键:tools 白名单之后追加单行 JSON 数组的 x-tools:。
+
+    白名单只有名字,丢 input_schema/side_effects;x-tools(x- 扩展命名
+    空间,Claude Code 对未知 frontmatter 键宽容忽略)携带同结构
+    [{name,description,input_schema,side_effects}],parse 端优先还原。
+    """
+    if not ir.tools:
+        return ""
+    compact = json.dumps(
+        [t.to_dict() for t in ir.tools], ensure_ascii=False, separators=(",", ":")
+    )
+    return f"x-tools: {compact}\n"
+
+
 def _agent_md(ir: AgentIR, name: str, written: List[str]) -> str:
     """生成 subagent markdown:frontmatter(四键 + 可选 knowledge 清单)+ 纯 system_prompt 正文。
 
@@ -118,6 +133,7 @@ def _agent_md(ir: AgentIR, name: str, written: List[str]) -> str:
         f"name: {_yaml_str(name)}\n"
         f"description: {_yaml_str(_description(ir))}\n"
         f"{_tools_block(ir)}"
+        f"{_x_tools_line(ir)}"
         f"model: {_yaml_str(model)}\n"
     )
     if written:

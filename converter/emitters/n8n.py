@@ -61,9 +61,11 @@ def emit_n8n(ir: AgentIR, out_dir: str | Path) -> Path:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     knowledge = list(getattr(w, "knowledge", None) or ir.knowledge)
+    # WorkflowIR 无 tools 字段(契约未改),工具契约直接取源 ir.tools
+    tools = list(getattr(w, "tools", None) or ir.tools)
     _write_knowledge(knowledge, out)
     (out / "workflow.json").write_text(
-        json.dumps(_workflow(w), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+        json.dumps(_workflow(w, tools), indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
     (out / "README.md").write_text(_readme(w, knowledge), encoding="utf-8")
     return out
@@ -171,7 +173,7 @@ def _ordered_chain(w: "WorkflowIR") -> Tuple[List[str], List[Tuple[str, str]], D
     return order, edges, prompts
 
 
-def _workflow(w: "WorkflowIR") -> Dict[str, Any]:
+def _workflow(w: "WorkflowIR", tools: Optional[List[Any]] = None) -> Dict[str, Any]:
     """组装 n8n workflow 顶层结构(节点按 position 横排,connections 按名字映射)。"""
     order, edges, prompts = _ordered_chain(w)
     nodes: List[Dict[str, Any]] = [_trigger_node()]
@@ -213,6 +215,19 @@ def _workflow(w: "WorkflowIR") -> Dict[str, Any]:
             _connect(TRIGGER_NAME, order[0])
         for src, tgt in edges:
             _connect(src, tgt)
+    # x-source-skill:转换器私有扩展(n8n 导入宽容忽略未知顶层键),
+    # 携带原 description 与 system_prompt 全文保证 roundtrip——节点链只
+    # 是工作流骨架,原文的 Overview 等非步骤章节在这里保全(评测 F_prompt
+    # 曾因此降至 0.71)。与 openai.yaml 的 x-source-skill 同一模式。
+    # tools 键(同结构列表)携带工具契约 {name,description,input_schema,
+    # side_effects},workflow 形态不丢工具 schema。
+    xskill: Dict[str, Any] = {
+        "name": w.name,
+        "description": w.description,
+        "systemPrompt": w.system_prompt,
+    }
+    if tools:
+        xskill["tools"] = [t.to_dict() for t in tools]
     return {
         "name": str(getattr(w, "display_name", "") or getattr(w, "name", "") or "Workflow"),
         "nodes": nodes,
@@ -222,15 +237,7 @@ def _workflow(w: "WorkflowIR") -> Dict[str, Any]:
         "meta": {"templateCredsSetupCompleted": True},
         "pinData": {},
         "tags": [],
-        # x-source-skill:转换器私有扩展(n8n 导入宽容忽略未知顶层键),
-        # 携带原 description 与 system_prompt 全文保证 roundtrip——节点链只
-        # 是工作流骨架,原文的 Overview 等非步骤章节在这里保全(评测 F_prompt
-        # 曾因此降至 0.71)。与 openai.yaml 的 x-source-skill 同一模式。
-        "x-source-skill": {
-            "name": w.name,
-            "description": w.description,
-            "systemPrompt": w.system_prompt,
-        },
+        "x-source-skill": xskill,
     }
 
 

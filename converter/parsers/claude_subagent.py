@@ -7,11 +7,14 @@ root 指向 claude_subagent emitter 产出的目录:
 
 frontmatter 的 tools 是多行 YAML 列表(`- "Read"` 逐行),ir.parse_frontmatter
 只支持平面字符串(会把列表项折叠进 meta["tools"]),故另写 _parse_tools_list
-从原始 frontmatter 文本用正则提取列表项。.claude/agents/ 无 md 抛 FileNotFoundError。
+从原始 frontmatter 文本用正则提取列表项;工具契约(input_schema/side_effects)
+优先从 x-tools: 单行 JSON 扩展键还原(缺失时回退白名单名字)。
+.claude/agents/ 无 md 抛 FileNotFoundError。
 """
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import List, Union
@@ -25,6 +28,8 @@ except ImportError:  # pragma: no cover - 包内相对导入兜底
 
 _KEY_LINE_RE = re.compile(r"^([A-Za-z0-9_-]+)\s*:")
 _LIST_ITEM_RE = re.compile(r"^-\s*(.+?)\s*$")
+# x-tools: 单行 JSON 数组(emitter 的工具契约扩展键,紧随 tools 白名单)
+_X_TOOLS_LINE_RE = re.compile(r"^x-tools:\s*(\[.*\])\s*$", re.MULTILINE)
 
 
 def _raw_frontmatter(text: str) -> str:
@@ -81,6 +86,24 @@ def _parse_tools_list(meta_text: str) -> List[str]:
             if name:
                 names.append(name)
     return names
+
+
+def _parse_x_tools(meta_text: str) -> List[ToolSpec]:
+    """从原始 frontmatter 文本提取 x-tools: 单行 JSON 数组为 ToolSpec 列表。
+
+    emitter 的扩展键(紧随 tools 白名单),携带 input_schema/side_effects
+    全量契约;缺失或非法 JSON 时返回空列表,调用方回退白名单名字。
+    """
+    m = _X_TOOLS_LINE_RE.search(meta_text)
+    if not m:
+        return []
+    try:
+        data = json.loads(m.group(1))
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(data, list):
+        return []
+    return [ToolSpec.from_dict(t) for t in data if isinstance(t, dict)]
 
 
 _BLOCK_SCALAR_RE = re.compile(r"^(?:[|>][+-]?\d*|[|>])\s+")
@@ -147,7 +170,12 @@ def parse_claude_subagent(root: Union[str, Path]) -> AgentIR:
 
     name = slugify((meta.get("name") or "").strip() or base.name)
     display_name = " ".join(p.capitalize() for p in name.split("-") if p)
-    tools = [ToolSpec(name=t) for t in _parse_tools_list(_raw_frontmatter(text))]
+    # 工具契约优先走 x-tools(单行 JSON,input_schema/side_effects 全量);
+    # 兼容回退:仅名字的 tools 白名单(无 x-tools 行的社区手写 subagent)。
+    frontmatter = _raw_frontmatter(text)
+    tools = _parse_x_tools(frontmatter) or [
+        ToolSpec(name=t) for t in _parse_tools_list(frontmatter)
+    ]
 
     metadata = {
         "source_format": "claude-subagent",

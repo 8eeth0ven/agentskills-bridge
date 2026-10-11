@@ -3,17 +3,20 @@
 > **Skill ↔ Agent ↔ Workflow 三形态转换引擎** —— 一份 skill,九种 agent 框架 + 两种 workflow;任何一种形态,一键变成另外两种。  
 > Convert between skills, agent framework definitions, and workflows (11 formats). Powered by dual IRs and a local read-only LLM wiki.
 
-![Python](https://img.shields.io/badge/python-3.9%2B-blue)
+![Python](https://img.shields.io/badge/python-3.9%2B-blue) ![Dependencies](https://img.shields.io/badge/dependencies-0%20required-orange) ![Formats](https://img.shields.io/badge/formats-11%20bidirectional-purple) ![Tests](https://img.shields.io/badge/tests-140%2F140-brightgreen) ![Roundtrip](https://img.shields.io/badge/roundtrip-33%2F33%20·%208%20metrics%20%3D%201.0-success) ![License](https://img.shields.io/badge/license-MIT-lightgrey)
 
-![Dependencies](https://img.shields.io/badge/dependencies-0%20required-orange)
+**验证总览**(全部真实执行、可复现,明细见 [evaluation/SCORECARD.md](evaluation/SCORECARD.md)):
 
-![Formats](https://img.shields.io/badge/formats-9%20bidirectional-purple)
-
-![Tests](https://img.shields.io/badge/tests-70%2F70-brightgreen)
-
-![Roundtrip](https://img.shields.io/badge/roundtrip-27%2F27%20·%20F%3D1.0000-success)
-
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+| 层 | 结果 |
+| --- | --- |
+| 单元 / 矩阵测试 | **140/140 通过**(零依赖可跑:`python3 -m unittest discover tests`) |
+| 静态保真 + 语义指标 | 3 语料 × 11 格式 = **33 链 × 8 指标(F 六项 + S_struct + S_terms)全部 1.0000** |
+| 行为等价(真实 LLM) | 同题对照 + LLM judge:**17/17 判定语义一致**(8 探针 + 1 道两轮追问,温度 0.2) |
+| 真实引擎运行时 | **6 个框架真实安装加载产物**:crewai 1.15.27、langchain 1.4.4、deepagents 0.7.23、autogen(AG2)、**langflow 1.12.5(引擎真实解析,组件实例化 4/4)** |
+| 真实 LLM 端到端 | GLM 双协议 × 4 框架产物 = **9/9 链跑通**(答案命中 skill 正文) |
+| 外部第三方输入 | **14 份**真实输入(crewAI-examples / langflow 官方 fixtures / anthropics skills / 真实 subagents)双向全部通过 |
+| 工具契约 | input_schema 在 **8/11 格式**字典级往返(其余格式无 schema 挂载点) |
+| 缺陷治理 | 迭代定位并修复 **25+ 个缺陷**,全程留痕于 [REPORT.md](evaluation/REPORT.md) |
 
 把一个 agent skill(`SKILL.md` + `references/` + `agents/openai.yaml`)转换成主流框架的 agent 定义,也能反向还原。所有转换经过中间表示 **AgentIR**(新增框架成本 O(1));格式知识沉淀在只读 **llm-wiki**(人可读,LLM agent 也可读);零强制依赖,Python ≥3.9 直接跑;SKILL.md 输出对齐 [agentskills.io](https://agentskills.io/specification) 开放规范;密钥只经环境变量,永不入库。
 

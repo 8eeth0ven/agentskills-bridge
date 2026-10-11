@@ -23,6 +23,7 @@ from typing import List, Optional
 
 from converter.ir import AgentIR
 from converter.emitters.crewai_skills import _write_scripts
+from converter.skill_writer import _frontmatter_metadata
 
 MODEL = "anthropic:claude-sonnet-4-6"
 
@@ -200,12 +201,23 @@ def _yaml_str(value: str) -> str:
 
 
 def _skill_md(ir: AgentIR, name: str) -> str:
-    """生成 SKILL.md:frontmatter(name/description)+ system_prompt 正文。"""
+    """生成 SKILL.md:frontmatter(name/description + 可选 metadata 行)+ 正文。
+
+    metadata 行(单行 JSON)复用 skill_writer._frontmatter_metadata:携带
+    tools 契约(input_schema/side_effects)等语义键,经 parse_deepagents →
+    load_skill 还原 —— deepagents 的 agent.py 不含 @tool stub(工具留给
+    skills/ 运行时),SKILL.md 是工具 schema 的唯一载体。
+    """
     body = (ir.system_prompt or "").strip() or "(源 agent 未提供系统提示词。)"
+    meta_line = ""
+    metadata = _frontmatter_metadata(ir)
+    if metadata:
+        compact = json.dumps(metadata, ensure_ascii=False, separators=(",", ":"))
+        meta_line = "\nmetadata: " + compact
     return (
         "---\n"
         f"name: {_yaml_str(name)}\n"
-        f"description: {_yaml_str(_description(ir))}\n"
+        f"description: {_yaml_str(_description(ir))}{meta_line}\n"
         "---\n\n"
         f"{body}\n"
     )

@@ -19,8 +19,9 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Set, Tuple
 
 try:
     from converter.ir import AgentIR, KnowledgeDoc, TaskStep, slugify
@@ -28,6 +29,72 @@ except ImportError:  # pragma: no cover - 包内相对导入兜底
     from .ir import AgentIR, KnowledgeDoc, TaskStep, slugify  # type: ignore
 
 __all__ = ["WorkflowNode", "WorkflowEdge", "WorkflowIR"]
+
+
+# ---------- 角色文本匹配(零依赖:词袋 + Jaccard + 贪心分配) ----------
+# 服务于 from_agent_ir 的角色挂载优先级链第 2 级:
+#     task.agent 显式绑定 > 文本匹配 > 按序兜底
+# 真实 crewai 项目 tasks.yaml 常不写 agent 字段,且 agent 顺序与 task
+# 顺序未必一致——按序对齐会错位,这里用 task.description 与每个 agent 的
+# (role + " " + goal) 的词袋 Jaccard 相似度做全局最优分配。
+
+_STOPWORDS_EN = frozenset({"the", "a", "of", "to", "and", "in", "for", "with"})
+_STOPWORDS_CJK = "的与和在对"
+_WORD_RE = re.compile(r"[a-z0-9]+")
+_CJK_RE = re.compile(r"[\u4e00-\u9fff]+")
+_MIN_SIM = 0.05  # Jaccard 低于该值的对不分配(噪声防误配)
+
+
+def _bag_of_words(text: str) -> Set[str]:
+    """词袋 token 化(零依赖):小写;英文/数字按词切,保留 ≥2 字符并去
+    英文停用词;中文按停用字切断后取 2-gram(单字不保留)。"""
+    lowered = text.lower()
+    for ch in _STOPWORDS_CJK:  # 中文停用字当分隔符
+        lowered = lowered.replace(ch, " ")
+    tokens: Set[str] = set()
+    for word in _WORD_RE.findall(lowered):
+        if len(word) >= 2 and word not in _STOPWORDS_EN:
+            tokens.add(word)
+    for run in _CJK_RE.findall(lowered):
+        for i in range(len(run) - 1):  # bigram 天然满足 ≥2 字符
+            tokens.add(run[i : i + 2])
+    return tokens
+
+
+def _jaccard(a: Set[str], b: Set[str]) -> float:
+    """词袋 Jaccard 重合度;任一侧为空视为 0(空描述不参与匹配)。"""
+    if not a or not b:
+        return 0.0
+    return len(a & b) / len(a | b)
+
+
+def _greedy_role_match(
+    task_texts: List[str], agent_texts: List[str]
+) -> Dict[int, int]:
+    """N×M 相似度矩阵上的贪心分配:候选对按相似度降序,每轮取全局最大
+    并排除已用行列(一 task 一 agent);相似度 < _MIN_SIM 的对不分配,
+    该 task 回退不挂角色。返回 {task_idx: agent_idx};空结果 = 完全无
+    相似,调用方整体回退按序。"""
+    t_tokens = [_bag_of_words(t) for t in task_texts]
+    a_tokens = [_bag_of_words(a) for a in agent_texts]
+    pairs = sorted(
+        (
+            (_jaccard(tt, at), i, j)
+            for i, tt in enumerate(t_tokens)
+            for j, at in enumerate(a_tokens)
+        ),
+        key=lambda p: (-p[0], p[1], p[2]),  # 相似度降序;同分按 (task, agent) 序稳定
+    )
+    match: Dict[int, int] = {}
+    used_agents: Set[int] = set()
+    for sim, i, j in pairs:
+        if sim < _MIN_SIM:
+            break  # 已降序,后面全部低于阈值
+        if i in match or j in used_agents:
+            continue
+        match[i] = j
+        used_agents.add(j)
+    return match
 
 
 @dataclass
@@ -134,6 +201,7 @@ class WorkflowIR:
         """
         nodes: List[WorkflowNode] = []
         used: Dict[str, int] = {}
+        role_alignment = ""  # tasks 分支填写(explicit/text-match/positional/none)
 
         def _unique_id(name: str) -> str:
             base = slugify(name)
@@ -158,13 +226,19 @@ class WorkflowIR:
                     prompt=step.get("body", ""),
                 ))
         elif ir.tasks:
-            # 角色挂载(语义审计 P1):crewai 多 agent 反向时,task.agent 指明
-            # 承担角色的 agent 名;真实项目 tasks.yaml 常不写 agent 字段
-            # (运行时分配),此时若 agent 数与 task 数相等则按序对齐(crewai
-            # 常见模式)。metadata.agents 携带 role/goal,节点 prompt 前缀
+            # 角色挂载(P1→P2 升级:按序启发式 → 文本相似度最优分配):
+            # 优先级链 task.agent 显式绑定 > 文本匹配 > 按序兜底。
+            # crewai 多 agent 反向时 task.agent 指明承担角色的 agent 名;
+            # 真实项目 tasks.yaml 常不写 agent 字段(运行时分配),此时先对
+            # task.description 与每个 agent 的 (role + goal) 做词袋 Jaccard
+            # 贪心最优分配(agent 顺序与 task 顺序不一致也能对上);完全
+            # 无相似才按序兜底(数量相等才对齐,crewai 常见模式)。
+            # metadata.agents 携带 role/goal,节点 prompt 前缀
             # "As <role>: <goal>" —— 否则 workflow 节点只知"做什么",
-            # 不知"谁以什么角色做"。
-            role_by_agent = {}
+            # 不知"谁以什么角色做"。metadata["role_alignment"] 记录实际
+            # 采用的策略(explicit / text-match / positional / none),
+            # 供评测与可解释性。
+            role_by_agent: Dict[str, Tuple[str, str]] = {}
             ordered_agents: List[str] = []
             for a in (ir.metadata or {}).get("agents") or []:
                 if isinstance(a, dict) and a.get("name"):
@@ -172,14 +246,31 @@ class WorkflowIR:
                     role_by_agent[str(a["name"])] = (
                         str(a.get("role") or ""), str(a.get("goal") or "")
                     )
-            positional = (
-                not any(t.agent for t in ir.tasks)
-                and len(ir.tasks) == len(ordered_agents)
-            )
+            explicit = [bool(t.agent) for t in ir.tasks]
+            consumed = {t.agent for t in ir.tasks if t.agent}  # 显式绑定占用 agent 列
+            avail = [a for a in ordered_agents if a not in consumed]
+            unbound_idx = [i for i, e in enumerate(explicit) if not e]
+            assigned: Dict[int, str] = {}
+            match: Dict[int, int] = _greedy_role_match(
+                [ir.tasks[i].description or "" for i in unbound_idx],
+                [" ".join(role_by_agent[a]) for a in avail],
+            ) if unbound_idx and avail else {}
+            if match:
+                for k, j in match.items():
+                    assigned[unbound_idx[k]] = avail[j]
+            elif not any(explicit) and len(ir.tasks) == len(ordered_agents):
+                # 完全无相似(或无可用 agent)→ 按序兜底,与历史行为一致
+                assigned = {i: ordered_agents[i] for i in range(len(ir.tasks))}
+            if any(explicit):
+                role_alignment = "explicit"
+            elif match:
+                role_alignment = "text-match"
+            elif assigned:
+                role_alignment = "positional"
+            else:
+                role_alignment = "none"
             for idx, step in enumerate(ir.tasks):
-                agent_name = step.agent or (
-                    ordered_agents[idx] if positional and idx < len(ordered_agents) else ""
-                )
+                agent_name = step.agent or assigned.get(idx, "")
                 prompt = step.description or ""
                 if agent_name and agent_name in role_by_agent:
                     role, goal = role_by_agent[agent_name]
@@ -232,6 +323,8 @@ class WorkflowIR:
         metadata["_workflow"] = True
         if steps:
             metadata["steps_extracted"] = len(steps)
+        if role_alignment:
+            metadata["role_alignment"] = role_alignment
         return cls(
             name=ir.name,
             display_name=ir.display_name,

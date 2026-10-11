@@ -11,16 +11,17 @@ agents/*.yaml 的场景同源,故直接复用其 extract_interface_fields()。
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
-from typing import Union
+from typing import List, Union
 
 try:
-    from converter.ir import AgentIR, slugify
+    from converter.ir import AgentIR, ToolSpec, slugify
     from converter.parsers.knowledge import collect_knowledge
     from converter.skill_loader import extract_interface_fields
 except ImportError:  # pragma: no cover - 包内相对导入兜底
-    from ..ir import AgentIR, slugify  # type: ignore
+    from ..ir import AgentIR, ToolSpec, slugify  # type: ignore
     from ..skill_loader import extract_interface_fields  # type: ignore
     from .knowledge import collect_knowledge  # type: ignore
 
@@ -36,6 +37,8 @@ def _first_body_line(text: str) -> str:
 
 _XSKILL_NAME_RE = re.compile(r"^\s*name:\s*[\"']?([^\"'\n#]+?)[\"']?\s*$", re.MULTILINE)
 _XSKILL_DESC_RE = re.compile(r"^\s*description:\s*[\"']?(.+?)[\"']?\s*$", re.MULTILINE)
+# x-source-skill 段内的 tools: 单行 JSON 数组(emitter 写出的流式序列)
+_XSKILL_TOOLS_RE = re.compile(r"^\s*tools:\s*(\[.*\])\s*$", re.MULTILINE)
 
 
 def _x_source_skill(yaml_text: str) -> dict:
@@ -54,7 +57,22 @@ def _x_source_skill(yaml_text: str) -> dict:
     m = _XSKILL_DESC_RE.search(section)
     if m:
         out["description"] = m.group(1).strip()
+    m = _XSKILL_TOOLS_RE.search(section)
+    if m:
+        try:
+            data = json.loads(m.group(1))
+        except json.JSONDecodeError:
+            data = None
+        if isinstance(data, list):
+            out["tools"] = data
     return out
+
+
+def _x_tools_to_specs(raw: object) -> List[ToolSpec]:
+    """x-source-skill.tools(JSON 数组)→ ToolSpec 列表;形态非法时空列表。"""
+    if not isinstance(raw, list):
+        return []
+    return [ToolSpec.from_dict(t) for t in raw if isinstance(t, dict)]
 
 
 def parse_openai(root: Union[str, Path]) -> AgentIR:
@@ -95,6 +113,7 @@ def parse_openai(root: Union[str, Path]) -> AgentIR:
         description=description,
         system_prompt=system_prompt,
         default_prompt=default_prompt,
+        tools=_x_tools_to_specs(xskill.get("tools")),
         knowledge=collect_knowledge(base),
         metadata={
             "source_format": "openai",

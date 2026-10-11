@@ -27,6 +27,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from converter.ir import AgentIR
+from converter.skill_writer import _frontmatter_metadata
 
 EXPECTED_OUTPUT = "结构化的最终回答,必要时引用技能内 references/ 参考文档"
 
@@ -90,12 +91,23 @@ def _yaml_str(value: str) -> str:
 
 
 def _skill_md(ir: AgentIR, name: str) -> str:
-    """生成 SKILL.md:frontmatter(name/description)+ system_prompt 正文。"""
+    """生成 SKILL.md:frontmatter(name/description + 可选 metadata 行)+ 正文。
+
+    metadata 行(单行 JSON,agentskills.io 允许的扩展对象)复用
+    skill_writer._frontmatter_metadata:携带 tools 契约(input_schema/
+    side_effects)与 graph_edges 等语义键,经 parse_crewai_skills →
+    load_skill 还原,agent→crewai-skills 反向不再静默丢工具 schema。
+    """
     body = (ir.system_prompt or "").strip() or "(源 agent 未提供系统提示词。)"
+    meta_line = ""
+    metadata = _frontmatter_metadata(ir)
+    if metadata:
+        compact = json.dumps(metadata, ensure_ascii=False, separators=(",", ":"))
+        meta_line = "\nmetadata: " + compact
     return (
         "---\n"
         f"name: {_yaml_str(name)}\n"
-        f"description: {_yaml_str(_description(ir))}\n"
+        f"description: {_yaml_str(_description(ir))}{meta_line}\n"
         "---\n\n"
         f"{body}\n"
     )

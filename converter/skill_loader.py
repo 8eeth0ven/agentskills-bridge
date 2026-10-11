@@ -15,12 +15,12 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Any, Dict, Union
+from typing import Any, Dict, List, Union
 
 try:
-    from converter.ir import AgentIR, KnowledgeDoc, parse_frontmatter, slugify
+    from converter.ir import AgentIR, KnowledgeDoc, ToolSpec, parse_frontmatter, slugify
 except ImportError:  # pragma: no cover - 包内相对导入兜底
-    from .ir import AgentIR, KnowledgeDoc, parse_frontmatter, slugify  # type: ignore
+    from .ir import AgentIR, KnowledgeDoc, ToolSpec, parse_frontmatter, slugify  # type: ignore
 
 
 def _strip_quotes(value: str) -> str:
@@ -135,12 +135,23 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
     }
     # frontmatter metadata 键(agentskills.io 扩展对象,单行 JSON):还原
     # write_skill 序列化的拓扑/角色语义键(graph_edges 等),让分支 DAG
-    # 经 skill 形态中转不丢。
+    # 经 skill 形态中转不丢。其中 tools 键是工具契约([{name,description,
+    # input_schema,side_effects}]),pop 出来直接填 IR.tools —— 修复
+    # agent→skill 反向时 tools 被静默丢弃的缺陷(此处是唯一 tools 来源,
+    # 直接覆盖默认空列表)。
+    tools: List[ToolSpec] = []
     m_meta = re.search(r'^metadata:\s*(\{.*\})\s*$', text, re.MULTILINE)
     if m_meta:
         try:
             restored = json.loads(m_meta.group(1))
             if isinstance(restored, dict):
+                raw_tools = restored.pop("tools", None)
+                if isinstance(raw_tools, list):
+                    tools = [
+                        ToolSpec.from_dict(t)
+                        for t in raw_tools
+                        if isinstance(t, dict)
+                    ]
                 for key, value in restored.items():
                     metadata.setdefault(key, value)
         except json.JSONDecodeError:
@@ -151,6 +162,7 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
         description=description,
         system_prompt=body,
         default_prompt=default_prompt,
+        tools=tools,
         knowledge=knowledge,
         scripts=scripts,
         metadata=metadata,

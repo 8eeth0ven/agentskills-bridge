@@ -11,6 +11,7 @@
     system_prompt           -> 单节点直取;多节点合并为 "## Step N: {name}" 分节
     knowledge/              -> collect_knowledge(同目录)
     模型子节点(lmChat*)   -> metadata["model"](resourceLocator 的 value)
+    x-source-skill.tools    -> ir.tools(ToolSpec 列表,input_schema/side_effects 全量)
 
 容错:n8n.io 模板 API 的 {"workflow": {...}} 包装;目录形态自动定位
 workflow.json(缺失时找目录下唯一含 nodes 的 *.json)。
@@ -23,10 +24,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple, Union
 
 try:
-    from converter.ir import AgentIR, TaskStep, slugify
+    from converter.ir import AgentIR, TaskStep, ToolSpec, slugify
     from converter.parsers.knowledge import collect_knowledge
 except ImportError:  # pragma: no cover - 包内相对导入兜底
-    from ..ir import AgentIR, TaskStep, slugify  # type: ignore
+    from ..ir import AgentIR, TaskStep, ToolSpec, slugify  # type: ignore
     from .knowledge import collect_knowledge  # type: ignore
 
 AGENT_NODE_TYPE = "@n8n/n8n-nodes-langchain.agent"
@@ -224,6 +225,13 @@ def _extract_model(nodes: List[Dict[str, Any]]) -> Optional[str]:
     return None
 
 
+def _x_tools_to_specs(raw: object) -> List[ToolSpec]:
+    """x-source-skill.tools(列表)→ ToolSpec 列表;形态非法时空列表。"""
+    if not isinstance(raw, list):
+        return []
+    return [ToolSpec.from_dict(t) for t in raw if isinstance(t, dict)]
+
+
 # ---------- 主入口 ----------
 
 def parse_n8n(path: Union[str, Path]) -> AgentIR:
@@ -307,6 +315,7 @@ def parse_n8n(path: Union[str, Path]) -> AgentIR:
         display_name=display_name,
         description=description,
         system_prompt=system_prompt,
+        tools=_x_tools_to_specs(xskill.get("tools")),
         knowledge=collect_knowledge(source_path.parent),
         tasks=[TaskStep(name=nm, description=msg, agent=nm) for nm, msg in steps],
         metadata=metadata,
