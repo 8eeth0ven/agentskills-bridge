@@ -226,6 +226,36 @@ diff evaluation/corpus/S2_cn/SKILL.md out/case8-back/SKILL.md
 
 实际结果:9 个 target 全部成功;`diff` 无输出——**中文 SKILL.md 经 flow.json 编码往返后逐字节一致**。
 
+## 案例 9:skill → workflow(n8n / mermaid-workflow)
+
+输入沿用案例 1 的仓库自带 skill([agent-fullcycle-engineering](agent-fullcycle-engineering/SKILL.md))——它的正文里有一个 9 步的 "Full Lifecycle Workflow" 节,转换器会**语义提取这些步骤**生成工作流(而不是把整篇当一个大 prompt):
+
+```bash
+python3 cli.py skill2agent examples/agent-fullcycle-engineering --target n8n --out out/case9-n8n
+python3 cli.py skill2agent examples/agent-fullcycle-engineering --target mermaid-workflow --out out/case9-mermaid
+```
+
+**n8n 产物实际结果**(workflow.json 可直接 Import from File):**9 个 AI Agent 节点**(type `@n8n/n8n-nodes-langchain.agent`,各节点 `options.systemMessage` = 对应步骤指令)+ Chat Trigger 入口,connections 按步骤顺序成链:
+
+```text
+agent 节点: 9 | 链: Chat Trigger → Clarify the job → Map the environment
+            → Choose the simplest architecture → Design contracts → ...
+首节点 systemMessage: "Clarify the job: user, target outcome, non-goals,
+                      allowed actions, success criteria..."
+```
+
+**mermaid 产物实际结果**(workflow.md,GitHub 原生渲染;实际 9 节点 8 边,此处摘录前三步,其后每节点一节 `## Step N: <name>` 放该步指令):
+
+```mermaid
+flowchart TD
+    clarify-the-job["Clarify the job"] --> map-the-environment["Map the environment"]
+    map-the-environment --> choose-the-simplest-architecture["Choose the simplest architecture"]
+```
+
+**反向**同样可逆:`agent2skill --from n8n`(或 `--from mermaid-workflow`)读回——`x-source-skill` / Source Context 节携带原文全文与 description,roundtrip 六项指标满分(12 篇 knowledge 回流、F_prompt=1.0)。
+
+转换路径:skill_loader → AgentIR →(正文步骤提取 / IR.tasks)→ WorkflowIR → workflow emitters,契约与有损点见 [三形态](../llm-wiki/01-concepts/three-forms.md);能力保留对照见 [能力对照矩阵](CAPABILITY-MATRIX.md) 的 n8n / mermaid-workflow 两列。skill / agent / workflow 三形态至此互转闭环:**任何一种形态都能经 IR 枢纽变成另外两种**。
+
 ---
 
-各能力(name/正文/知识/scripts/工具契约)在 9 种形态下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md);完整评测见 [evaluation/REPORT.md](../evaluation/REPORT.md)。
+各能力(name/正文/知识/scripts/工具契约)在 11 种形态(9 种 agent + n8n / mermaid-workflow 两种 workflow)下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md);完整评测见 [evaluation/REPORT.md](../evaluation/REPORT.md)。

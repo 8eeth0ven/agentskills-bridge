@@ -1,6 +1,6 @@
 # llm-wiki 总目录
 
-agentskills-bridge 项目的只读知识库:skill ↔ agent 双向转换的概念、格式、框架与流程参考。
+agentskills-bridge 项目的只读知识库:skill / agent / workflow 三形态互转的概念、格式、框架与流程参考。
 
 **本 wiki 只读,由 `MANIFEST.sha256` 保护**——每个文件的 SHA-256 记录在清单中,`python cli.py wiki verify` 会校验。任何章节的修改都必须同步重新生成清单,否则 verify 失败。不要直接编辑已落盘的章节文件。
 
@@ -10,6 +10,7 @@ agentskills-bridge 项目的只读知识库:skill ↔ agent 双向转换的概�
 
 - [skill-vs-agent](01-concepts/skill-vs-agent.md) —— skill 与 agent 的定义、本质区别(声明式知识包 vs 可执行运行时)、字段三列映射表、选型判断。
 - [intermediate-representation](01-concepts/intermediate-representation.md) —— AgentIR 规范:逐字段说明(与 `converter/ir.py` 严格一致)、序列化格式与完整 JSON 示例。
+- [three-forms](01-concepts/three-forms.md) —— 三种形态(Skill / Agent / Workflow)概念、3×3 互转表、WorkflowIR 契约(与 `converter/wir.py` 严格一致)与 workflow 格式族(n8n / mermaid-workflow 新增)。
 
 ## 02-skill-format —— skill 目录格式
 
@@ -24,6 +25,8 @@ agentskills-bridge 项目的只读知识库:skill ↔ agent 双向转换的概�
 - [openai-agents](03-frameworks/openai-agents.md) —— openai 目标的 `agents/openai.yaml` + `instructions.md` + `knowledge/` 布局;OpenAI 已采纳 agentskills.io 开放规范,含 Codex skills 目录约定。
 - [autogen](03-frameworks/autogen.md) —— AutoGen(AG2):第 9 个正式 target,`AssistantAgent` 形态 agent.py 的 emit/parse 规则与新旧 API 对照。
 - [llm-provider-config](03-frameworks/llm-provider-config.md) —— GLM/OpenAI/Claude 三协议对照与转换产物接 GLM/Claude 的 base_url 接法。
+
+n8n 与 mermaid-workflow 两个 workflow target 的格式说明并入 [three-forms](01-concepts/three-forms.md) 的「workflow 格式族」一节——workflow 格式族先记于该章,后续独立成章。
 
 ## 04-conversion —— 转换流程
 

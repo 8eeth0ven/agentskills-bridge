@@ -26,6 +26,9 @@ TARGET_FORMATS = (
     "openai",
     "claude-subagent",
     "generic",
+    # workflow 形态 —— skill / agent / workflow 三形态互转的第三族
+    "n8n",
+    "mermaid-workflow",
 )
 
 

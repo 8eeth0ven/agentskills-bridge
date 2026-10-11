@@ -1,7 +1,7 @@
 # agentskills-bridge
 
-> **Skill ↔ Agent 双向转换引擎** —— 一份 skill,九种主流 Agent 框架形态;一个 Agent 工程,一键还原成 skill。  
-> Convert any agent skill into 9 mainstream agent framework formats — and back. Powered by a normalization IR and a local read-only LLM wiki.
+> **Skill ↔ Agent ↔ Workflow 三形态转换引擎** —— 一份 skill,九种 agent 框架 + 两种 workflow;任何一种形态,一键变成另外两种。  
+> Convert between skills, agent framework definitions, and workflows (11 formats). Powered by dual IRs and a local read-only LLM wiki.
 
 ![Python](https://img.shields.io/badge/python-3.9%2B-blue)
 
@@ -18,7 +18,7 @@
 把一个 agent skill(`SKILL.md` + `references/` + `agents/openai.yaml`)转换成主流框架的 agent 定义,也能反向还原。所有转换经过中间表示 **AgentIR**(新增框架成本 O(1));格式知识沉淀在只读 **llm-wiki**(人可读,LLM agent 也可读);零强制依赖,Python ≥3.9 直接跑;SKILL.md 输出对齐 [agentskills.io](https://agentskills.io/specification) 开放规范;密钥只经环境变量,永不入库。
 
 ```bash
-# 一份 skill → 九种框架;任何框架 agent → skill(knowledge 完整回流 references/)
+# 一份 skill → 11 种形态(agent ×9 + workflow ×2);反向亦然(knowledge 完整回流)
 python3 cli.py skill2agent ./my-skill --target crewai --out out/crewai
 python3 cli.py agent2skill out/crewai --from crewai --out out/back-skill
 ```
@@ -45,6 +45,10 @@ flowchart LR
 | **claude-subagent** | `.claude/agents/<name>.md`(frontmatter + 正文 prompt)          | frontmatter + 正文 + knowledge/ |
 | **autogen**         | AG2 `AssistantAgent` 形态 `agent.py`(build_agent 工厂)           | 自描述常量 / 构造参数                  |
 | **generic**         | `agent.json`(AgentIR 规范序列化)                                  | 完整还原                          |
+| **n8n**             | workflow 形态:`workflow.json`(AI Agent 节点链,Import from File)  | workflow.json(x-source-skill 保真) |
+| **mermaid-workflow** | workflow 形态:`workflow.md`(flowchart DAG,GitHub 原生渲染)   | workflow.md(Source Context 保真)  |
+
+前 9 种是 **agent 形态**;后 2 种是 **workflow 形态**——skill / agent / workflow 三种资产经 AgentIR + WorkflowIR 双枢纽互转,任何一种都能变成另外两种(SKILL.md 里的编号步骤会被语义提取为工作流节点)。
 
 ## 快速开始
 
@@ -60,13 +64,13 @@ python3 cli.py ir examples/agent-fullcycle-engineering --out out/ir.json
 python3 cli.py wiki list && python3 cli.py wiki read 03-frameworks/crewai.md
 ```
 
-想先看输入→输出长什么样?八个真实转换案例(正向 / 第三方 CrewAI 项目反向 / Langflow 官方 flow 反向 / roundtrip 哈希保真 / 官方 docx 脚本型技能 / 真实 subagent 反向 / 11 节点复杂 flow / 中文全目标)见 [examples/SHOWCASE.md](examples/SHOWCASE.md);各能力(scripts、渐进披露、工具契约……)在 9 种形态下的保留情况见 [能力对照矩阵](examples/CAPABILITY-MATRIX.md)。
+想先看输入→输出长什么样?九个真实转换案例(正向 / 第三方 CrewAI 项目反向 / Langflow 官方 flow 反向 / roundtrip 哈希保真 / 官方 docx 脚本型技能 / 真实 subagent 反向 / 11 节点复杂 flow / 中文全目标 / skill→workflow)见 [examples/SHOWCASE.md](examples/SHOWCASE.md);各能力(scripts、渐进披露、工具契约……)在 11 种形态下的保留情况见 [能力对照矩阵](examples/CAPABILITY-MATRIX.md)。
 
 ## 测试与评测
 
 完整报告:[evaluation/REPORT.md](evaluation/REPORT.md)。全部可复现。
 
-**静态保真矩阵** — 3 语料(真实 / 中文边界 / 极简)× 9 格式 = 27 条 roundtrip 链,F_name / F_desc / F_prompt / F_know_q / F_know_c / V_format 六项指标全部 1.0000(基线 F_prompt 0.9189,定位并修复 16 个缺陷后收敛)。复现:`python3 evaluation/run_eval.py`。
+**静态保真矩阵** — 3 语料(真实 / 中文边界 / 极简)× 11 格式 = 33 条 roundtrip 链,F_name / F_desc / F_prompt / F_know_q / F_know_c / V_format 六项指标全部 1.0000(基线 F_prompt 0.9189,定位并修复 16 个缺陷后收敛)。复现:`python3 evaluation/run_eval.py`。
 
 **真实框架运行时** — 非静态检查,真实安装框架后加载产物:
 
@@ -83,7 +87,7 @@ python3 cli.py wiki list && python3 cli.py wiki read 03-frameworks/crewai.md
 
 ```bash
 python3 -m unittest discover tests   # 70/70
-python3 evaluation/run_eval.py       # 27 链全 1.0000
+python3 evaluation/run_eval.py       # 33 链全 1.0000
 python3 cli.py wiki verify           # 14 章完整性
 ```
 

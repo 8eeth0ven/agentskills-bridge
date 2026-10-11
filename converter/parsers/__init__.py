@@ -4,7 +4,7 @@
     from converter.parsers import PARSERS
     ir = PARSERS["crewai"](config_dir)
     # 键 ∈ crewai / crewai-skills / deepagents / langchain / langflow /
-    #     openai / claude-subagent / generic
+    #     openai / claude-subagent / generic / n8n / mermaid-workflow
 """
 
 from __future__ import annotations
@@ -19,6 +19,12 @@ from .langchain import parse_langchain
 from .langflow import parse_langflow
 from .openai import parse_openai
 
+try:  # 并行线程产物:未落盘时跳过该键,不影响其余 parser
+    from .n8n import parse_n8n  # type: ignore
+except Exception:  # pragma: no cover - n8n 未落盘
+    parse_n8n = None  # type: ignore
+from .mermaid_workflow import parse_mermaid_workflow
+
 PARSERS = {
     "autogen": parse_autogen,
     "crewai": parse_crewai,
@@ -30,6 +36,9 @@ PARSERS = {
     "claude-subagent": parse_claude_subagent,
     "generic": parse_generic,
 }
+if parse_n8n is not None:
+    PARSERS["n8n"] = parse_n8n
+PARSERS["mermaid-workflow"] = parse_mermaid_workflow
 
 __all__ = [
     "PARSERS",
@@ -42,4 +51,5 @@ __all__ = [
     "parse_langchain",
     "parse_langflow",
     "parse_openai",
+    "parse_mermaid_workflow",
 ]

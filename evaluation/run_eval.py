@@ -49,7 +49,8 @@ except Exception:  # pragma: no cover - 并行线程未落盘
     PARSERS = {}
 
 TARGETS = ["crewai", "crewai-skills", "deepagents", "langchain",
-           "langflow", "openai", "claude-subagent", "generic", "autogen"]
+           "langflow", "openai", "claude-subagent", "generic", "autogen",
+           "n8n", "mermaid-workflow"]
 
 CORPORA: List[Tuple[str, Path]] = [
     ("S1_real", ROOT / "examples" / "agent-fullcycle-engineering"),
@@ -58,7 +59,14 @@ CORPORA: List[Tuple[str, Path]] = [
 ]
 
 # roundtrip parse 入口(契约见模块 docstring)
-_PARSER_ENTRY_FILE = {"langchain": "agent.py", "langflow": "flow.json", "generic": "agent.json", "autogen": "agent.py"}
+_PARSER_ENTRY_FILE = {
+    "langchain": "agent.py",
+    "langflow": "flow.json",
+    "generic": "agent.json",
+    "autogen": "agent.py",
+    "n8n": "workflow.json",
+    "mermaid-workflow": "workflow.md",
+}
 
 # PARSERS 对应键(含可能的命名变体;全部缺失 → parser-missing)
 _PARSER_KEYS: Dict[str, Tuple[str, ...]] = {
@@ -71,6 +79,8 @@ _PARSER_KEYS: Dict[str, Tuple[str, ...]] = {
     "claude-subagent": ("claude-subagent", "claude_subagent"),
     "generic": ("generic",),
     "autogen": ("autogen",),
+    "n8n": ("n8n",),
+    "mermaid-workflow": ("mermaid-workflow", "mermaid_workflow"),
 }
 
 F_KEYS = ["F_name", "F_desc", "F_prompt", "F_know_q", "F_know_c"]

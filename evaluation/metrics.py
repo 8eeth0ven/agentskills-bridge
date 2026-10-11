@@ -531,6 +531,55 @@ def v_autogen(root: Path) -> Tuple[int, List[str]]:
     return (0, errors) if errors else (1, [])
 
 
+def v_n8n(root: Path) -> Tuple[int, List[str]]:
+    """n8n:workflow.json 可 json.load、含非空 nodes 与 connections 键,
+    且至少一个节点 type 含 "agent"。"""
+    reasons: List[str] = []
+    workflow_json = root / "workflow.json"
+    if not workflow_json.is_file():
+        return 0, ["缺 workflow.json"]
+    try:
+        data = json.loads(workflow_json.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError) as exc:
+        return 0, [f"workflow.json 不可解析: {exc}"]
+    if not isinstance(data, dict):
+        return 0, ["workflow.json 不是 JSON object"]
+    nodes = data.get("nodes")
+    if not isinstance(nodes, list) or not nodes:
+        return 0, ["workflow.json 无 nodes(或为空)"]
+    if "connections" not in data:
+        reasons.append("workflow.json 缺 connections 键")
+    if not any(
+        isinstance(n, dict) and "agent" in str(n.get("type") or "")
+        for n in nodes
+    ):
+        reasons.append('无 type 含 "agent" 的节点')
+    return (0 if reasons else 1), reasons
+
+
+def v_mermaid_workflow(root: Path) -> Tuple[int, List[str]]:
+    """mermaid-workflow:*.md 存在且某文件含 ```mermaid 代码块、
+    块类型为 flowchart/graph、方向为 TD/LR。"""
+    reasons: List[str] = []
+    mds = sorted(root.glob("*.md"))
+    if not mds:
+        return 0, ["缺 *.md"]
+    ok = False
+    for md in mds:
+        try:
+            text = md.read_text(encoding="utf-8")
+        except OSError as exc:
+            reasons.append(f"{md.name} 读取失败: {exc}")
+            continue
+        if "```mermaid" in text and (
+            "flowchart" in text or "graph" in text
+        ) and re.search(r"\b(TD|LR)\b", text):
+            ok = True
+    if not ok:
+        reasons.append("*.md 无 ```mermaid flowchart/graph TD/LR 块")
+    return (0 if reasons else 1), reasons
+
+
 VALIDATORS: Dict[str, Any] = {
     "crewai": v_crewai,
     "crewai-skills": v_crewai_skills,
@@ -541,6 +590,8 @@ VALIDATORS: Dict[str, Any] = {
     "claude-subagent": v_claude_subagent,
     "generic": v_generic,
     "autogen": v_autogen,
+    "n8n": v_n8n,
+    "mermaid-workflow": v_mermaid_workflow,
 }
 
 

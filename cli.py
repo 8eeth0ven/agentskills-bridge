@@ -127,6 +127,7 @@ def main(argv=None) -> int:
         choices=[
             "crewai", "crewai-skills", "deepagents", "langchain",
             "langflow", "openai", "claude-subagent", "generic", "autogen",
+            "n8n", "mermaid-workflow",
         ],
     )
     p2.add_argument("--out", required=True)

@@ -1,6 +1,7 @@
 # llm-wiki integrity manifest (sha256)  -- regenerate via maintainer only
 5e19639c49aa889d25b1f3d73bb2b7b204433b1b0c7b3822e32afccd0d13eae3  01-concepts/intermediate-representation.md
 589c546b9e6cf7b38620cee8033bee326290fdf97613bd95b9ffd615258d24ed  01-concepts/skill-vs-agent.md
+e68c5d17e7dbdc99624c41558e52a444b5d856ed6b50116fd71360ad23f2920d  01-concepts/three-forms.md
 ea2ac9c7a902998e2e40f8c18126ab4f6a3b2c5a4b0134c402d06a3d0a656abe  02-skill-format/openai-interface-yaml.md
 b616aea8d9227dc9214f5d3604c992f15352fcbdb51666978d16bc7223138345  02-skill-format/skill-md.md
 4d439c3171b403704ee6781454e84f9fb5f440de9ad8e4fd5dc998250fe81feb  03-frameworks/autogen.md
@@ -12,4 +13,4 @@ f83d240931afd7f52870d3148882610803627ef1edba4eb748a7940a4ce9a3d8  03-frameworks/
 f16a522e2eabc294e4976ed426456730331332de016e5fe5f2cbe08ac6fd3ed5  04-conversion/agent-to-skill.md
 9dae040090050428ea222515c2b3af42b4f1e3227176b020f117d426f634e6ae  04-conversion/skill-to-agent.md
 e0522f3b782a184beb7e95adfbdb9635285c5b322fad5de1bc93ed8e88f9bc39  05-evaluation/roundtrip-fidelity.md
-87fdf55554de59ac3fd016c4317033a51456ecae7aeae0511933879f8438f9fd  INDEX.md
+4c8b85c9d5490cc777181d660e72dafd477d621c593cf14c77550ce474243911  INDEX.md

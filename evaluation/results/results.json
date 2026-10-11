@@ -16,7 +16,9 @@
         "openai",
         "claude-subagent",
         "generic",
-        "autogen"
+        "autogen",
+        "n8n",
+        "mermaid-workflow"
       ]
     },
     "corpus_notes": {},
@@ -36,6 +38,8 @@
       "generic",
       "langchain",
       "langflow",
+      "mermaid-workflow",
+      "n8n",
       "openai"
     ],
     "emitters_available": [
@@ -47,6 +51,8 @@
       "generic",
       "langchain",
       "langflow",
+      "mermaid-workflow",
+      "n8n",
       "openai"
     ],
     "metrics_formulas": {
@@ -132,6 +138,22 @@
       "L": []
     },
     {
+      "corpus": "S1_real",
+      "target": "n8n",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S1_real",
+      "target": "mermaid-workflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
       "corpus": "S2_cn",
       "target": "crewai",
       "v_format": 1,
@@ -204,6 +226,22 @@
       "L": []
     },
     {
+      "corpus": "S2_cn",
+      "target": "n8n",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "mermaid-workflow",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
       "corpus": "S3_min",
       "target": "crewai",
       "v_format": 1,
@@ -270,6 +308,22 @@
     {
       "corpus": "S3_min",
       "target": "autogen",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "n8n",
+      "v_format": 1,
+      "v_reasons": [],
+      "error": null,
+      "L": []
+    },
+    {
+      "corpus": "S3_min",
+      "target": "mermaid-workflow",
       "v_format": 1,
       "v_reasons": [],
       "error": null,
@@ -404,6 +458,34 @@
       "error": null
     },
     {
+      "corpus": "S1_real",
+      "target": "n8n",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S1_real",
+      "target": "mermaid-workflow",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
       "corpus": "S2_cn",
       "target": "crewai",
       "status": "ok",
@@ -530,6 +612,34 @@
       "error": null
     },
     {
+      "corpus": "S2_cn",
+      "target": "n8n",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S2_cn",
+      "target": "mermaid-workflow",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
       "corpus": "S3_min",
       "target": "crewai",
       "status": "ok",
@@ -644,6 +754,34 @@
     {
       "corpus": "S3_min",
       "target": "autogen",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "n8n",
+      "status": "ok",
+      "metrics": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0
+      },
+      "L": [],
+      "error": null
+    },
+    {
+      "corpus": "S3_min",
+      "target": "mermaid-workflow",
       "status": "ok",
       "metrics": {
         "F_name": 1.0,
@@ -747,6 +885,26 @@
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
+      },
+      "n8n": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
+      },
+      "mermaid-workflow": {
+        "F_name": 1.0,
+        "F_desc": 1.0,
+        "F_prompt": 1.0,
+        "F_know_q": 1.0,
+        "F_know_c": 1.0,
+        "V_format": 1.0,
+        "roundtrip_samples": 3,
+        "forward_samples": 3
       }
     },
     "global": {
@@ -756,8 +914,8 @@
       "F_know_q": 1.0,
       "F_know_c": 1.0,
       "V_format": 1.0,
-      "roundtrip_samples": 27,
-      "forward_samples": 27
+      "roundtrip_samples": 33,
+      "forward_samples": 33
     },
     "loss_freq": []
   }
