@@ -80,6 +80,27 @@ def _safe_rel(rel: str) -> Union[Path, None]:
     return p
 
 
+def _frontmatter_metadata(ir) -> dict:
+    """挑 ir.metadata 中可进 frontmatter 的子集(单行 JSON,agentskills.io
+    允许的 metadata 扩展对象)。
+
+    排除:本机绝对路径(source_path)与下划线私有键;保留拓扑/角色等
+    语义键(graph_edges / agents / agents_all / agents_count /
+    steps_extracted / model / source_format)。值不可 JSON 序列化时跳过。
+    """
+    keep = ("graph_edges", "agents", "agents_all", "agents_count",
+            "steps_extracted", "model", "source_format", "chain")
+    out: dict = {}
+    for key in keep:
+        if key in (ir.metadata or {}):
+            try:
+                json.dumps(ir.metadata[key])
+                out[key] = ir.metadata[key]
+            except (TypeError, ValueError):
+                continue
+    return out
+
+
 def write_skill(
     ir: AgentIR,
     out_dir: Union[str, Path],
@@ -97,10 +118,17 @@ def write_skill(
 
     # SKILL.md:frontmatter + system_prompt 正文
     # frontmatter 先按 agentskills.io 开放规范规范化(name kebab ≤64、
-    # description 非空 ≤1024),再拼正文。
+    # description 非空 ≤1024),再拼正文。metadata 键是规范允许的扩展对象:
+    # 单行 JSON 序列化 ir.metadata 的可保留子集(graph_edges 等),让分支
+    # DAG 等拓扑信息经 skill 形态中转不丢(语义审计 P2 的 skill 侧补全)。
     name = _normalize_skill_name(ir.name)
     desc = _normalize_skill_description(ir)
-    skill_md = f"---\nname: {name}\ndescription: {desc}\n---\n\n{ir.system_prompt or ''}"
+    metadata = _frontmatter_metadata(ir)
+    meta_line = ""
+    if metadata:
+        compact = json.dumps(metadata, ensure_ascii=False, separators=(",", ":"))
+        meta_line = "\nmetadata: " + compact
+    skill_md = f"---\nname: {name}\ndescription: {desc}{meta_line}\n---\n\n{ir.system_prompt or ''}"
     if not skill_md.endswith("\n"):
         skill_md += "\n"
     (out / "SKILL.md").write_text(skill_md, encoding="utf-8")

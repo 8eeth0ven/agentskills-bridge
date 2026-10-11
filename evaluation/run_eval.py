@@ -4,7 +4,8 @@
 
 forward   :emit → V_format 静态校验(失分记入该行 L)
 roundtrip :emit → parse(PARSERS 对应键;缺键标 parser-missing,不崩)
-            → write_skill → load_skill → F_name/F_desc/F_prompt/F_know_q/F_know_c + L
+            → write_skill → load_skill → F_name/F_desc/F_prompt/F_know_q/F_know_c
+            + S_struct/S_terms(语义级,公式见 semantics.py;terms_detail 记入结果行)+ L
 
 产物:
     <out>/results.json  逐条目含指标与 L
@@ -33,6 +34,7 @@ sys.path.insert(0, str(ROOT))      # converter 包
 sys.path.insert(0, str(EVAL_DIR))  # metrics / make_corpus
 
 import metrics as M  # noqa: E402
+import semantics as S  # noqa: E402
 import make_corpus  # noqa: E402
 
 from converter.ir import AgentIR  # noqa: E402
@@ -83,7 +85,9 @@ _PARSER_KEYS: Dict[str, Tuple[str, ...]] = {
     "mermaid-workflow": ("mermaid-workflow", "mermaid_workflow"),
 }
 
-F_KEYS = ["F_name", "F_desc", "F_prompt", "F_know_q", "F_know_c"]
+# 汇总列:5 个字符级 F 指标 + 2 个语义级 S 指标(evaluation/semantics.py)
+F_KEYS = ["F_name", "F_desc", "F_prompt", "F_know_q", "F_know_c",
+          "S_struct", "S_terms"]
 
 
 # --------------------------------------------------------------------------
@@ -197,7 +201,11 @@ def run_matrix(work: Path) -> Tuple[List[dict], List[dict], Dict[str, str]]:
                 continue
 
             m, losses = M.roundtrip_metrics(ir_in, ir_out)
+            sem = S.semantic_metrics(ir_in=ir_in, ir_out=ir_out)
+            m["S_struct"] = sem["S_struct"]
+            m["S_terms"] = sem["S_terms"]
             rrow["metrics"] = m
+            rrow["terms_detail"] = sem["terms_detail"]
             rrow["L"].extend(losses)
 
     return forward_rows, roundtrip_rows, notes
@@ -268,7 +276,8 @@ def build_markdown(summary: Dict[str, Any], notes: Dict[str, str], run_date: str
     lines.append("")
     lines.append("## 汇总表")
     lines.append("")
-    header = ["target", "F_name", "F_desc", "F_prompt", "F_know_q", "F_know_c", "V_format", "n"]
+    header = ["target", "F_name", "F_desc", "F_prompt", "F_know_q", "F_know_c",
+              "S_struct", "S_terms", "V_format", "n"]
     lines.append("| " + " | ".join(header) + " |")
     lines.append("|" + "|".join(["---"] * len(header)) + "|")
     for target in TARGETS:
@@ -326,6 +335,8 @@ def main(argv: List[str]) -> int:
                 "F_prompt": "归一(strip+\\r\\n→\\n)相等 → 1.0,否则 1 - levenshtein/max(len)",
                 "F_know_q": "len(out.knowledge)/len(in.knowledge),in=0 → 1.0",
                 "F_know_c": "sha256 内容一致的 knowledge 数/len(in.knowledge),in=0 → 1.0",
+                "S_struct": "0.4*steps(LCS/max) + 0.3*know Jaccard + 0.2*slug name 相等 + 0.1*desc 非空",
+                "S_terms": "5 类语义关键 token(数字/限定词/否定/强命令/专有名词)保留率等权平均",
                 "V_format": "forward 产物静态校验,通过=1 否则=0(附原因)",
             },
         },

@@ -18,9 +18,10 @@
 把一个 agent skill(`SKILL.md` + `references/` + `agents/openai.yaml`)转换成主流框架的 agent 定义,也能反向还原。所有转换经过中间表示 **AgentIR**(新增框架成本 O(1));格式知识沉淀在只读 **llm-wiki**(人可读,LLM agent 也可读);零强制依赖,Python ≥3.9 直接跑;SKILL.md 输出对齐 [agentskills.io](https://agentskills.io/specification) 开放规范;密钥只经环境变量,永不入库。
 
 ```bash
-# 一份 skill → 11 种形态(agent ×9 + workflow ×2);反向亦然(knowledge 完整回流)
+# 一份 skill → 11 种形态;任意形态 → 任意形态一步(convert 万能命令)
 python3 cli.py skill2agent ./my-skill --target crewai --out out/crewai
 python3 cli.py agent2skill out/crewai --from crewai --out out/back-skill
+python3 cli.py convert <任意产物路径> --from n8n --target langchain --out out/任意到任意
 ```
 
 ```mermaid
@@ -71,6 +72,8 @@ python3 cli.py wiki list && python3 cli.py wiki read 03-frameworks/crewai.md
 完整报告:[evaluation/REPORT.md](evaluation/REPORT.md)。全部可复现。
 
 **静态保真矩阵** — 3 语料(真实 / 中文边界 / 极简)× 11 格式 = 33 条 roundtrip 链,F_name / F_desc / F_prompt / F_know_q / F_know_c / V_format 六项指标全部 1.0000(基线 F_prompt 0.9189,定位并修复 16 个缺陷后收敛)。复现:`python3 evaluation/run_eval.py`。
+
+**语义验证(三层)** — 字符级之上,标准见 [semantic-equivalence](llm-wiki/05-evaluation/semantic-equivalence.md):L1 结构等价(S_struct:步骤保序/知识集)与 L2 术语保留(S_terms:数字/限定/否定/命令五类)已并入评测矩阵两列(33 链全 1.0);L3 行为等价用真实 LLM 同题对照——原形态 vs 转换后 agent/workflow 形态,glm-4-flash 温度 0.2 下 **10/10 判定语义一致**(探针与协议:`evaluation/behavior/`)。
 
 **真实框架运行时** — 非静态检查,真实安装框架后加载产物:
 

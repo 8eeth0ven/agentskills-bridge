@@ -12,6 +12,7 @@ agents/*.yaml 是嵌套结构(interface.display_name),ir.parse_frontmatter 只�
 
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import Any, Dict, Union
@@ -132,6 +133,18 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
         "source_path": str(skill_path.resolve()),
         "short_description": short_description or _first_sentence(description),
     }
+    # frontmatter metadata 键(agentskills.io 扩展对象,单行 JSON):还原
+    # write_skill 序列化的拓扑/角色语义键(graph_edges 等),让分支 DAG
+    # 经 skill 形态中转不丢。
+    m_meta = re.search(r'^metadata:\s*(\{.*\})\s*$', text, re.MULTILINE)
+    if m_meta:
+        try:
+            restored = json.loads(m_meta.group(1))
+            if isinstance(restored, dict):
+                for key, value in restored.items():
+                    metadata.setdefault(key, value)
+        except json.JSONDecodeError:
+            pass
     return AgentIR(
         name=name,
         display_name=display_name,

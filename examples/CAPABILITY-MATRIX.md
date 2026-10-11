@@ -1,6 +1,6 @@
 # 能力对照矩阵
 
-skill 侧能力转换到 11 种目标形态(9 种 agent 形态 + n8n / mermaid-workflow 两种 workflow 形态)后的保留情况逐项对照。每格都有可验证的证据(评测指标 / 案例 / 产物文件),不含臆断。矩阵先于文档存在——正是它暴露了「scripts/ 不迁移」的差距,已修复(见 scripts 行注)。
+skill 侧能力转换到 11 种目标形态(9 种 agent 形态 + n8n / mermaid-workflow 两种 workflow 形态)后的保留情况逐项对照。每格都有可验证的证据(评测指标 / 案例 / 产物文件),不含臆断。矩阵先于文档存在——正是它暴露了「scripts/ 不迁移」的差距,已修复(见 scripts 行注)。语义级验证(结构 / 术语 / 行为三层)见 [semantic-equivalence](../llm-wiki/05-evaluation/semantic-equivalence.md)(L1/L2/L3)。
 
 图例:✅ 完整保留 · ⚠️ 降级保留(形式在,语义需人工一步)· ❌ 不随迁移(IR 留名单,README 注明)
 

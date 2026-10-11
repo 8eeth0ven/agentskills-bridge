@@ -128,6 +128,31 @@ def _fallback_prompt(node: Dict[str, Any]) -> str:
 
 # ---------- 执行顺序 ----------
 
+def _extract_edges(connections: Any, valid: set) -> List[List[str]]:
+    """从 connections 提取去重 main 边表(保分支拓扑)。"""
+    edges: List[List[str]] = []
+    seen = set()
+    if isinstance(connections, dict):
+        for src, cmap in connections.items():
+            src = str(src)
+            if src not in valid or not isinstance(cmap, dict):
+                continue
+            for ctype, groups in cmap.items():
+                if ctype != "main" or not isinstance(groups, list):
+                    continue
+                for group in groups:
+                    if not isinstance(group, list):
+                        continue
+                    for conn in group:
+                        if not isinstance(conn, dict):
+                            continue
+                        tgt = str(conn.get("node") or "")
+                        if tgt in valid and tgt != src and (src, tgt) not in seen:
+                            seen.add((src, tgt))
+                            edges.append([src, tgt])
+    return sorted(edges)
+
+
 def _execution_order(nodes: List[Dict[str, Any]], connections: Any) -> List[str]:
     """触发器/入度 0 起 BFS 重建 main 链执行顺序;无 connections 按 nodes 顺序。"""
     names: List[str] = []
@@ -263,6 +288,12 @@ def parse_n8n(path: Union[str, Path]) -> AgentIR:
         metadata["model"] = model
     if agent_names:
         metadata["chain"] = list(agent_names)
+    # graph_edges:保留完整 DAG 拓扑(含分支)。tasks/chain 是线性投影,
+    # 分支语义(A→B 且 A→C)只能靠边表表达;emit_n8n 见到该键时按原图
+    # 重建 connections,否则分支会被压成线性链(语义审计 P2)。
+    graph_edges = _extract_edges(connections, set(node_by_name))
+    if graph_edges:
+        metadata["graph_edges"] = graph_edges
 
     description = str(xskill.get("description") or data.get("description") or "").strip()
     if not description:

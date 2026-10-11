@@ -61,6 +61,8 @@
       "F_prompt": "归一(strip+\\r\\n→\\n)相等 → 1.0,否则 1 - levenshtein/max(len)",
       "F_know_q": "len(out.knowledge)/len(in.knowledge),in=0 → 1.0",
       "F_know_c": "sha256 内容一致的 knowledge 数/len(in.knowledge),in=0 → 1.0",
+      "S_struct": "0.4*steps(LCS/max) + 0.3*know Jaccard + 0.2*slug name 相等 + 0.1*desc 非空",
+      "S_terms": "5 类语义关键 token(数字/限定词/否定/强命令/专有名词)保留率等权平均",
       "V_format": "forward 产物静态校验,通过=1 否则=0(附原因)"
     }
   },
@@ -340,10 +342,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -354,10 +390,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -368,10 +438,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -382,10 +486,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -396,10 +534,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -410,10 +582,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -424,10 +630,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -438,10 +678,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -452,10 +726,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -466,10 +774,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S1_real",
@@ -480,10 +822,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 2,
+          "kept_count": 2,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 4,
+          "kept_count": 4,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 9,
+          "kept_count": 9,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -494,10 +870,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -508,10 +918,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -522,10 +966,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -536,10 +1014,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -550,10 +1062,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -564,10 +1110,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -578,10 +1158,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -592,10 +1206,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -606,10 +1254,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -620,10 +1302,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S2_cn",
@@ -634,10 +1350,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 6,
+          "kept_count": 6,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -648,10 +1398,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -662,10 +1446,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -676,10 +1494,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -690,10 +1542,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -704,10 +1590,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -718,10 +1638,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -732,10 +1686,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -746,10 +1734,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -760,10 +1782,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -774,10 +1830,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     },
     {
       "corpus": "S3_min",
@@ -788,10 +1878,44 @@
         "F_desc": 1.0,
         "F_prompt": 1.0,
         "F_know_q": 1.0,
-        "F_know_c": 1.0
+        "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0
       },
       "L": [],
-      "error": null
+      "error": null,
+      "terms_detail": {
+        "numbers": {
+          "score": 1.0,
+          "orig_count": 1,
+          "kept_count": 1,
+          "lost": []
+        },
+        "qualifiers": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "negation": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "strong_cmd": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        },
+        "proper_nouns": {
+          "score": 1.0,
+          "orig_count": 0,
+          "kept_count": 0,
+          "lost": []
+        }
+      }
     }
   ],
   "summary": {
@@ -802,6 +1926,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -812,6 +1938,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -822,6 +1950,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -832,6 +1962,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -842,6 +1974,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -852,6 +1986,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -862,6 +1998,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -872,6 +2010,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -882,6 +2022,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -892,6 +2034,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -902,6 +2046,8 @@
         "F_prompt": 1.0,
         "F_know_q": 1.0,
         "F_know_c": 1.0,
+        "S_struct": 1.0,
+        "S_terms": 1.0,
         "V_format": 1.0,
         "roundtrip_samples": 3,
         "forward_samples": 3
@@ -913,6 +2059,8 @@
       "F_prompt": 1.0,
       "F_know_q": 1.0,
       "F_know_c": 1.0,
+      "S_struct": 1.0,
+      "S_terms": 1.0,
       "V_format": 1.0,
       "roundtrip_samples": 33,
       "forward_samples": 33

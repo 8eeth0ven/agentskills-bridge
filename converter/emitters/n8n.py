@@ -191,10 +191,28 @@ def _workflow(w: "WorkflowIR") -> Dict[str, Any]:
         conns = connections.setdefault(src, {"main": [[]]})
         conns["main"][0].append({"node": tgt, "type": "main", "index": 0})
 
-    if order:
-        _connect(TRIGGER_NAME, order[0])
-    for src, tgt in edges:
-        _connect(src, tgt)
+    # 分支拓扑优先:parser 保留的 graph_edges(含 A→B 且 A→C 的并行分支)
+    # 与当前节点匹配的部分按原图重建——线性 edges 会把分支压成链,丢失
+    # DAG 语义(语义审计 P2)。来自触发器的边(源不在 agent 名集内)由
+    # TRIGGER 逻辑接管;agent 间边全匹配才启用,否则回退线性链。
+    graph_edges = (getattr(w, "metadata", None) or {}).get("graph_edges")
+    name_set = set(order)
+    if isinstance(graph_edges, list):
+        internal = [e for e in graph_edges
+                    if isinstance(e, list) and len(e) == 2
+                    and e[0] in name_set and e[1] in name_set]
+    else:
+        internal = []
+    if internal:
+        for src, tgt in internal:
+            _connect(src, tgt)
+        if order and not any(e[1] == order[0] for e in internal):
+            _connect(TRIGGER_NAME, order[0])
+    else:
+        if order:
+            _connect(TRIGGER_NAME, order[0])
+        for src, tgt in edges:
+            _connect(src, tgt)
     return {
         "name": str(getattr(w, "display_name", "") or getattr(w, "name", "") or "Workflow"),
         "nodes": nodes,

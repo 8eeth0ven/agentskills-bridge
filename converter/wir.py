@@ -158,8 +158,37 @@ class WorkflowIR:
                     prompt=step.get("body", ""),
                 ))
         elif ir.tasks:
-            for step in ir.tasks:
+            # 角色挂载(语义审计 P1):crewai 多 agent 反向时,task.agent 指明
+            # 承担角色的 agent 名;真实项目 tasks.yaml 常不写 agent 字段
+            # (运行时分配),此时若 agent 数与 task 数相等则按序对齐(crewai
+            # 常见模式)。metadata.agents 携带 role/goal,节点 prompt 前缀
+            # "As <role>: <goal>" —— 否则 workflow 节点只知"做什么",
+            # 不知"谁以什么角色做"。
+            role_by_agent = {}
+            ordered_agents: List[str] = []
+            for a in (ir.metadata or {}).get("agents") or []:
+                if isinstance(a, dict) and a.get("name"):
+                    ordered_agents.append(str(a["name"]))
+                    role_by_agent[str(a["name"])] = (
+                        str(a.get("role") or ""), str(a.get("goal") or "")
+                    )
+            positional = (
+                not any(t.agent for t in ir.tasks)
+                and len(ir.tasks) == len(ordered_agents)
+            )
+            for idx, step in enumerate(ir.tasks):
+                agent_name = step.agent or (
+                    ordered_agents[idx] if positional and idx < len(ordered_agents) else ""
+                )
                 prompt = step.description or ""
+                if agent_name and agent_name in role_by_agent:
+                    role, goal = role_by_agent[agent_name]
+                    role = " ".join(role.split())
+                    goal = " ".join(goal.split())
+                    header = "As " + (role or agent_name) + "."
+                    if goal:
+                        header += " Goal: " + goal
+                    prompt = header + "\n\n" + prompt
                 if step.expected_output:
                     prompt = f"{prompt}\n\nExpected output: {step.expected_output}"
                 nodes.append(WorkflowNode(

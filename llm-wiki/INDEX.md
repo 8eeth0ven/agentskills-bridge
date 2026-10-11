@@ -36,6 +36,7 @@ n8n 与 mermaid-workflow 两个 workflow target 的格式说明并入 [three-for
 ## 05-evaluation —— 转换质量评测
 
 - [roundtrip-fidelity](05-evaluation/roundtrip-fidelity.md) —— 转换质量评测体系:7 个指标(F_name/F_desc/F_prompt/F_know_q/F_know_c/V_format/L)定义、三语料测试集、3 corpus × 8 target 实验矩阵与复现命令。
+- [semantic-equivalence](05-evaluation/semantic-equivalence.md) —— 语义等价验证标准:字符级指标测不出语义漂移的原因、三层验证体系(L1 结构等价 S_struct / L2 术语保留 S_terms / L3 行为等价)、L3 协议(探针选取 / 同温对照 / judge JSON / 90% 阈值)与语义审计已修复缺陷(P1 多 agent 角色、P2 分支 DAG)。
 
 ## 章节编写约定
 

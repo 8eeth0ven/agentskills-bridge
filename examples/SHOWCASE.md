@@ -256,6 +256,49 @@ flowchart TD
 
 转换路径:skill_loader → AgentIR →(正文步骤提取 / IR.tasks)→ WorkflowIR → workflow emitters,契约与有损点见 [三形态](../llm-wiki/01-concepts/three-forms.md);能力保留对照见 [能力对照矩阵](CAPABILITY-MATRIX.md) 的 n8n / mermaid-workflow 两列。skill / agent / workflow 三形态至此互转闭环:**任何一种形态都能经 IR 枢纽变成另外两种**。
 
+## 案例 10:三形态全链与语义验证
+
+**万能 convert 子命令**:任意形态 → 任意 target 一步完成(12 种 `--from` × 11 种 `--target`,内部即 PARSERS → AgentIR → EMITTERS,与两步等价)。三形态全链演示——skill 直接转 n8n,n8n 产物**不经还原**直接转 langchain:
+
+```bash
+python3 cli.py convert examples/agent-fullcycle-engineering --from skill --target n8n --out out/c10
+python3 cli.py convert out/c10 --from n8n --target langchain --out out/c10-langchain
+```
+
+实际输出(均验证):
+
+- **n8n**:9 个 AI Agent 节点(type `@n8n/n8n-nodes-langchain.agent`)成链 `Chat Trigger → Clarify the job → Map the environment → Choose the simplest architecture → Design contracts → Plan the development loop → Build a vertical slice → Add tests and evals before broadening scope → Add operations → Release in stages`,各节点 `options.systemMessage` = 对应步骤指令;
+- **langchain**:`agent.py` 的 `SYSTEM_PROMPT` 含 `## Overview` 与 `## Full Lifecycle Workflow`——9 步完整保留为编号清单(`1. Clarify the job ... 9. Release in stages`)。
+
+**多 agent 角色保留**(语义审计 P1 修复的实证):案例 2 的 crewAI-examples 真实项目 screenplay_writer(5 agents / 5 tasks)直达 workflow:
+
+```bash
+python3 cli.py convert ./screenplay_writer --from crewai --target n8n --out out/c10-screenplay
+```
+
+5 个节点**全部**带角色前缀 `As <role>. Goal: <goal>`(workflow.json 各节点 systemMessage 首行,实际输出摘录):
+
+```text
+task0: As spamfilter. Goal: Decide whether a text is spam or not.
+task1: As analyse. Goal: You will distill all arguments from all discussion members...
+task2: As scriptwriter. Goal: Turn a conversation into a movie script...
+task3: As formatter. Goal: Format the text as asked...
+task4: As scorer. Goal: You score a dialogue assessing various aspects...
+```
+
+修复前节点只有任务描述,不知「谁以什么角色做」;tasks.yaml 未标 agent 时按 agent 数 = task 数序对齐(`converter/wir.py`)。
+
+**分支 DAG roundtrip**(语义审计 P2 修复的实证):构造 A→B / A→C 分支的 n8n workflow(Chat Trigger → A,A 同时连 B 与 C),经 generic(agent.json 内嵌 `metadata.graph_edges`)中转回 n8n:
+
+```bash
+python3 cli.py convert ./branch-demo --from n8n --target generic --out out/c10-branch-generic
+python3 cli.py convert out/c10-branch-generic --from generic --target n8n --out out/c10-branch-back
+```
+
+实际输出:connections 仍为分支——`{Chat Trigger→A, A→B, A→C}`,未被压成线性链(`converter/parsers/n8n.py` 保留完整边表,`converter/emitters/n8n.py` 重建时优先还原)。经 **skill 形态**中转(`agent2skill` 再 `--target n8n`)同样保分支:分支边表序列化进 SKILL.md frontmatter 的 `metadata:` 键(agentskills.io 规范允许的扩展对象,单行 JSON),`load_skill` 读回——语义审计阶段该路径曾退化为线性链,已修复并实测往返保留。
+
+**语义验证**:以上案例的语义质量由三层体系把关(标准见 [semantic-equivalence](../llm-wiki/05-evaluation/semantic-equivalence.md))——L1 结构等价(`S_struct`)与 L2 术语保留(`S_terms`)已并入 `python3 evaluation/run_eval.py` 汇总矩阵(当前全语料两列 1.0),L3 行为等价(原形态与转换形态同题同模型对照)探针位于 `evaluation/behavior/`。
+
 ---
 
 各能力(name/正文/知识/scripts/工具契约)在 11 种形态(9 种 agent + n8n / mermaid-workflow 两种 workflow)下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md);完整评测见 [evaluation/REPORT.md](../evaluation/REPORT.md)。

@@ -108,9 +108,49 @@ def cmd_wiki(args) -> int:
     raise SystemExit("unknown wiki subcommand")
 
 
+def cmd_convert(args) -> int:
+    """万能转换:任意形态(skill/agent/workflow)→ 任意 target,一步完成。
+
+    内部即 PARSERS[source] → AgentIR → EMITTERS[target],与两步等价;
+    skill 输入走 load_skill。--scripts-from 仅在产出 skill 类目录时生效。
+    """
+    if args.source == "skill":
+        ir = load_skill(args.path)
+    else:
+        from converter.parsers import PARSERS
+
+        if args.source not in PARSERS:
+            raise SystemExit(f"unsupported --from: {args.source} (choose from {sorted(PARSERS)})")
+        ir = PARSERS[args.source](args.path)
+    from converter.emitters import EMITTERS
+
+    if args.target not in EMITTERS:
+        raise SystemExit(f"unsupported --target: {args.target} (choose from {sorted(EMITTERS)})")
+    out = EMITTERS[args.target](ir, args.out)
+    emitted = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
+    print(f"[ok] {args.source} -> {args.target}: {out} ({len(emitted)} files)")
+    for rel in emitted:
+        print(f"  - {rel}")
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="agentskills-bridge", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
+
+    p0 = sub.add_parser("convert", help="any form -> any target in one step (skill/agent/workflow)")
+    p0.add_argument("path")
+    p0.add_argument(
+        "--from",
+        dest="source",
+        required=True,
+        choices=["skill", "crewai", "crewai-skills", "deepagents", "langchain",
+                 "langflow", "openai", "claude-subagent", "generic", "autogen",
+                 "n8n", "mermaid-workflow"],
+    )
+    p0.add_argument("--target", required=True, choices=sorted(TARGET_FORMATS))
+    p0.add_argument("--out", required=True)
+    p0.set_defaults(func=cmd_convert)
 
     p1 = sub.add_parser("skill2agent", help="convert a skill dir to a framework agent")
     p1.add_argument("skill_dir")

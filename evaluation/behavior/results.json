@@ -1,0 +1,213 @@
+{
+  "date": "2026-10-11",
+  "model": "glm-4-flash",
+  "temperature": 0.2,
+  "max_tokens": 600,
+  "probe_protocol": "5 探针问题,答案均明确依据于 SKILL.md 正文;三形态同模型同参各答一次;judge 同模型输出 {equivalent, reason};A=原 SKILL.md 正文,B=crewai backstory,C=n8n x-source-skill.systemPrompt",
+  "forms_chars": {
+    "A": 12736,
+    "B": 12979,
+    "C": 12736
+  },
+  "questions": [
+    {
+      "qid": "Q1",
+      "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字"
+    },
+    {
+      "qid": "Q2",
+      "question": "最多同时运行几个 subagents?(数字)"
+    },
+    {
+      "qid": "Q3",
+      "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?"
+    },
+    {
+      "qid": "Q4",
+      "question": "skill 说调试时应该 patch 哪一层?"
+    },
+    {
+      "qid": "Q5",
+      "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项"
+    }
+  ],
+  "answers": {
+    "A": {
+      "Q1": {
+        "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字",
+        "answer": "这个 skill 列出的 Response Modes 有以下几种：\n\n1. Beginner learning\n2. Interview preparation\n3. Project delivery\n4. Debugging or review",
+        "error": null
+      },
+      "Q2": {
+        "question": "最多同时运行几个 subagents?(数字)",
+        "answer": "根据文档中的描述，默认情况下最多同时运行三个 subagents：\n\n> Run at most three subagents concurrently by default and never assign overlapping writes. The parent agent owns planning, permission decisions, integration, conflict resolution, final verification, and the user-facing result.\n\n这意味着，除非有特殊需求或经过明确授权，否则子代理的并发运行数量限制为三个。",
+        "error": null
+      },
+      "Q3": {
+        "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?",
+        "answer": "选择架构时，只有在以下情况下才考虑使用 planner/executor 或 multi-agent：\n\n1. **任务复杂度**：当任务非常复杂，需要多个步骤，并且某些步骤需要 LLM 的判断时，planner/executor 或 multi-agent 可能是更好的选择。例如，需要根据外部系统状态动态调整步骤的复杂工作流。\n\n2. **任务边界模糊**：当任务边界不明确，需要多个独立的子任务协同工作时，multi-agent 可以帮助定义清晰的子任务边界，并管理它们之间的交互。\n\n3. **需要并行处理**：当某些步骤可以并行执行时，planner/executor 可以帮助管理这些并行任务，确保它们按正确的顺序执行。\n\n4. **需要复杂决策**：当需要根据外部系统状态或实时数据做出复杂决策时，planner/executor 可以帮助定义决策逻辑，并管理决策过程。\n\n5. **需要记忆和学习**：当任务需要记忆历史信息或从经验中学习时，planner/executor 或 multi-agent 可以帮助管理这些信息，并利用它们改进决策。\n\n以下是一些具体场景：\n\n- **多步骤工作流**：例如，自动化软件部署流程，可能包括代码审查、构建、测试、部署等步骤，其中某些步骤需要 LLM 的判断。\n- **多系统交互**：例如，自动化客户服务流程，需要与 CRM、邮件系统、聊天机器人等多个系统交互。\n- **需要记忆和推理**：例如，自动化投资组合管理，需要根据市场数据和用户偏好进行决策，并记住历史投资决策。\n\n总之，只有在任务复杂度较高，需要 LLM 的判断、并行处理、记忆和学习等高级功能时，才考虑使用 planner/executor 或 multi-agent。在大多数简单或中等复杂度的任务中，更简单的架构（如 RAG、工具调用等）可能就足够了。",
+        "error": null
+      },
+      "Q4": {
+        "question": "skill 说调试时应该 patch 哪一层?",
+        "answer": "根据提供的文档，调试时应该遵循以下步骤来 patch 最窄的失败层：\n\n1. **收集证据**：首先收集与问题相关的所有信息，包括错误日志、代码、输入数据、输出结果等。\n\n2. **隔离失败层**：根据收集到的证据，确定问题发生的具体位置，即哪个组件或代码段导致了错误。\n\n3. **窄范围 patch**：只修改导致问题的代码层，避免对其他无关代码进行不必要的修改。这样可以减少引入新错误的风险。\n\n4. **添加回归测试**：在修改代码后，添加新的回归测试来确保修复了问题，并且没有引入新的错误。\n\n具体来说，以下是一些步骤：\n\n- **确定错误类型**：是语法错误、逻辑错误、性能问题，还是其他类型？\n- **定位错误位置**：通过日志、堆栈跟踪、代码审查等方式确定错误发生的具体位置。\n- **修改代码**：只修改导致问题的代码层，避免修改其他代码。\n- **测试**：运行回归测试来确保修复了问题，并且没有引入新的错误。\n\n以下是一些具体的例子：\n\n- 如果是语法错误，只修改有语法错误的代码行。\n- 如果是逻辑错误，只修改导致逻辑错误的代码段。\n- 如果是性能问题，只修改导致性能问题的代码段。\n\n总之，调试时应该 narrow down 到导致问题的最小代码层，并只修改这部分代码，以减少引入新错误的风险。",
+        "error": null
+      },
+      "Q5": {
+        "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项",
+        "answer": "首次发布前，以下两项最低要求是必须完成的：\n\n1. **用户目标和验收标准**：确保用户的目标和项目需要达到的验收标准被明确记录下来。这有助于团队理解项目的方向和成功标准，并在开发过程中保持一致。\n\n2. **工具和数据权限**：确保所有使用的数据和工具都有明确的权限设置。这包括了解哪些数据可以访问、哪些工具可以使用，以及它们的使用范围和限制。这对于确保项目符合隐私和安全要求至关重要。",
+        "error": null
+      }
+    },
+    "B": {
+      "Q1": {
+        "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字",
+        "answer": "这个 skill 列出的 Response Modes 有以下几种：\n\n- Beginner learning\n- Interview preparation\n- Project delivery\n- Debugging or review",
+        "error": null
+      },
+      "Q2": {
+        "question": "最多同时运行几个 subagents?(数字)",
+        "answer": "根据文档中的描述，默认情况下最多同时运行 **三个 subagents**。\n\n以下是相关段落：\n\n> - 运行最多三个 subagents 并发，默认情况下，并且永远不要分配重叠的写入权限。父代理拥有规划、权限决策、集成、冲突解决、最终验证和面向用户的结果的拥有权。\n>\n> - 如果子代理不可用或不适合作业，则保留分解并按顺序执行它，而不阻塞任务。\n\n所以，默认情况下，最多可以同时运行三个子代理。",
+        "error": null
+      },
+      "Q3": {
+        "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?",
+        "answer": "选择架构时，只有在以下情况下才考虑使用 planner/executor 或 multi-agent：\n\n1. **任务复杂度**：当任务非常复杂，需要多个步骤和决策点，且这些步骤之间有依赖关系时，planner/executor 或 multi-agent 可以帮助更好地管理这些复杂性。\n\n2. **动态决策**：当任务需要根据实时数据或环境变化做出动态决策时，planner/executor 或 multi-agent 可以提供更好的灵活性。\n\n3. **子任务分解**：当任务可以分解为多个独立的子任务，且这些子任务可以并行执行时，multi-agent 可以提高效率。\n\n4. **协作需求**：当任务需要多个智能体之间进行协作时，multi-agent 是一个合适的选择。\n\n以下是具体的情况：\n\n- **planner/executor**：\n  - **步骤依赖**：当任务步骤之间存在依赖关系，需要按顺序执行时。\n  - **决策点**：当任务中存在多个决策点，需要根据不同情况选择不同的执行路径时。\n  - **资源管理**：当任务需要管理多个资源，如数据库连接、文件系统等时。\n\n- **multi-agent**：\n  - **子任务分解**：当任务可以分解为多个独立的子任务，且这些子任务可以并行执行时。\n  - **协作**：当任务需要多个智能体之间进行协作时，例如，一个智能体负责收集数据，另一个智能体负责分析数据。\n  - **分布式系统**：当任务需要在分布式系统上执行时，multi-agent 可以帮助管理不同节点之间的通信和协作。\n\n总之，在以下情况下，可以考虑使用 planner/executor 或 multi-agent：\n\n- 任务复杂度高，需要多个步骤和决策点。\n- 需要根据实时数据或环境变化做出动态决策。\n- 任务可以分解为多个独立的子任务，且这些子任务可以并行执行。\n- 需要多个智能体之间进行协作。",
+        "error": null
+      },
+      "Q4": {
+        "question": "skill 说调试时应该 patch 哪一层?",
+        "answer": "根据提供的 Agent Fullcycle Engineering 技能文档，调试时应该遵循以下原则来 patch 最合适的层：\n\n1. **收集证据**：首先收集所有可用的证据，包括错误日志、代码、测试结果等。\n\n2. **隔离失败层**：根据收集到的证据，确定哪个组件或层导致了问题。这可能是一个特定的函数、模块、工具调用或整个流程。\n\n3. **窄范围修复**：只修复导致问题的特定层，而不是进行广泛的代码重构或更改。这有助于避免引入新的错误。\n\n4. **回归测试**：在修复后，添加回归测试来确保修复没有引入新的问题，并验证修复确实解决了原始问题。\n\n以下是一些具体的层和步骤：\n\n**1. 代码层**：\n\n* 如果问题是由代码逻辑错误引起的，直接修复代码即可。\n* 使用单元测试和集成测试来验证修复。\n\n**2. 工具层**：\n\n* 如果问题是由外部工具或库引起的，首先检查工具的文档和错误日志。\n* 如果工具本身有缺陷，可能需要提交 bug 报告或等待工具更新。\n* 如果工具配置或调用方式有误，修复配置或调用方式。\n\n**3. 模型层**：\n\n* 如果问题是由模型输出引起的，检查模型训练数据和训练过程。\n* 考虑重新训练模型或调整模型参数。\n\n**4. 状态层**：\n\n* 如果问题与状态管理有关，检查状态存储和状态更新逻辑。\n* 确保状态一致性和正确性。\n\n**5. 环境层**：\n\n* 如果问题与外部环境有关，检查网络连接、权限和配置。\n* 确保环境满足系统要求。\n\n**总结**：\n\n调试时应该根据问题的具体原因，选择最合适的层进行修复。优先修复代码层，然后是工具层、模型层、状态层和环境层。修复后，进行回归测试以确保修复有效且没有引入新的问题。",
+        "error": null
+      },
+      "Q5": {
+        "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项",
+        "answer": "根据文档中提到的“Minimum Done Definition”，以下是两项首次发布前必须完成的最低要求：\n\n1. **用户目标和验收标准已记录**：这确保了团队对项目的目标有清晰的认识，并且可以据此进行评估和测试。\n\n2. **工具和数据权限是明确的**：这确保了项目在执行过程中有明确的权限控制，避免未经授权的访问和数据泄露。\n\n这两项要求对于确保项目安全、合规和按预期执行至关重要。",
+        "error": null
+      }
+    },
+    "C": {
+      "Q1": {
+        "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字",
+        "answer": "这个 skill 列出的 Response Modes 有以下几种：\n\n1. Beginner learning\n2. Interview preparation\n3. Project delivery\n4. Debugging or review",
+        "error": null
+      },
+      "Q2": {
+        "question": "最多同时运行几个 subagents?(数字)",
+        "answer": "默认情况下，最多同时运行三个 subagents。 \n\n这是为了确保任务执行的可控性和稳定性。具体来说：\n\n- **三个 subagents 的限制**：这是为了防止过多的并发执行导致资源竞争、状态冲突或性能问题。\n- **父代理的责任**：父代理负责规划、权限决策、集成、冲突解决、最终验证和用户界面结果，而子代理则专注于执行独立的子任务。\n- **并行执行**：虽然默认限制是三个，但父代理可以根据需要调整这个数量，或者根据任务的性质和资源情况来决定是否需要并行执行更多的子代理。\n\n总之，三个 subagents 是一个默认的起点，但可以根据具体情况进行调整。",
+        "error": null
+      },
+      "Q3": {
+        "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?",
+        "answer": "选择架构时，只有在以下情况下才考虑使用 planner/executor 或 multi-agent：\n\n1. **任务复杂度**：当任务非常复杂，需要多个步骤，并且某些步骤需要 LLM 的判断时，planner/executor 或 multi-agent 可能是更好的选择。\n\n2. **动态决策**：当任务需要根据运行时环境或输入动态调整步骤时，planner/executor 或 multi-agent 可以提供更好的灵活性。\n\n3. **子任务分解**：当可以将任务分解为多个独立的子任务，并且这些子任务可以并行执行时，multi-agent 可以提高效率。\n\n4. **协作需求**：当任务需要多个智能体之间协作时，multi-agent 是理想的选择。\n\n以下是具体的情况：\n\n- **planner/executor**：\n  - 任务步骤明确，但某些步骤需要 LLM 的判断。\n  - 步骤之间存在依赖关系，需要按顺序执行。\n  - 需要优化步骤执行顺序以提高效率。\n\n- **multi-agent**：\n  - 任务可以分解为多个独立的子任务。\n  - 子任务之间需要协作完成整个任务。\n  - 需要并行执行子任务以提高效率。\n\n以下是一些不推荐使用 planner/executor 或 multi-agent 的情况：\n\n- **简单任务**：对于简单任务，使用确定性代码或单次 LLM 调用即可。\n- **无状态任务**：对于无状态任务，使用 RAG 或工具调用即可。\n- **单智能体任务**：对于单智能体任务，使用单智能体架构即可。\n\n总之，只有在任务复杂度较高、需要动态决策、子任务分解或协作需求时，才考虑使用 planner/executor 或 multi-agent。",
+        "error": null
+      },
+      "Q4": {
+        "question": "skill 说调试时应该 patch 哪一层?",
+        "answer": "根据提供的文档，调试时应该遵循以下步骤来 patch 最窄的失败层：\n\n1. **收集证据**：首先收集与问题相关的所有信息，包括错误日志、代码变更、测试结果等。\n\n2. **隔离失败层**：通过分析收集到的证据，确定问题发生的具体位置，即哪个模块或代码片段导致了失败。\n\n3. **窄范围 patch**：针对隔离出的失败层进行修复。避免进行大范围的代码重构或修改，因为这可能会引入新的问题或影响其他功能。\n\n4. **添加回归测试**：在修复后，添加回归测试来确保修复没有引入新的问题，并验证修复是否解决了原始问题。\n\n以下是具体步骤：\n\n- **确定问题范围**：通过日志、错误信息、测试结果等确定问题发生的具体位置。\n- **编写修复代码**：针对问题所在层进行修复，确保修复代码尽可能简洁。\n- **编写回归测试**：编写测试用例来验证修复是否有效，并确保修复没有引入新的问题。\n- **运行测试**：运行回归测试，确保修复有效且没有引入新的问题。\n\n总结来说，调试时应先收集证据，然后隔离失败层，最后针对隔离出的失败层进行窄范围 patch，并添加回归测试来确保修复有效。这样可以确保修复问题同时避免引入新的问题。",
+        "error": null
+      },
+      "Q5": {
+        "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项",
+        "answer": "首次发布前，以下两项最低要求是必须完成的：\n\n1. **用户目标和验收标准**：确保用户的目标和项目需要达到的验收标准被明确记录下来。这有助于团队理解项目的目的，并确保开发工作与用户需求保持一致。\n\n2. **工具和数据权限**：明确项目所需的工具和数据权限，并确保所有相关方都了解并同意这些权限。这有助于避免在发布过程中遇到权限问题，并确保项目能够正常运行。\n\n这两项要求是确保项目能够顺利发布的基础，因为它们直接关系到项目的可行性和用户满意度。",
+        "error": null
+      }
+    }
+  },
+  "judgments": [
+    {
+      "pair": "A-B",
+      "other_form": "B",
+      "qid": "Q1",
+      "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字",
+      "equivalent": true,
+      "reason": "数字、列表项集合、核心结论一致"
+    },
+    {
+      "pair": "A-B",
+      "other_form": "B",
+      "qid": "Q2",
+      "question": "最多同时运行几个 subagents?(数字)",
+      "equivalent": true,
+      "reason": "数字和核心结论一致"
+    },
+    {
+      "pair": "A-B",
+      "other_form": "B",
+      "qid": "Q3",
+      "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?",
+      "equivalent": true,
+      "reason": "核心结论一致，细节描述不同"
+    },
+    {
+      "pair": "A-B",
+      "other_form": "B",
+      "qid": "Q4",
+      "question": "skill 说调试时应该 patch 哪一层?",
+      "equivalent": true,
+      "reason": "核心结论和步骤一致"
+    },
+    {
+      "pair": "A-B",
+      "other_form": "B",
+      "qid": "Q5",
+      "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项",
+      "equivalent": true,
+      "reason": "核心结论一致，数字和列表项集合相同"
+    },
+    {
+      "pair": "A-C",
+      "other_form": "C",
+      "qid": "Q1",
+      "question": "这个 skill 列出的 Response Modes 有哪几种?只列名字",
+      "equivalent": true,
+      "reason": "数字、列表项集合、核心结论一致"
+    },
+    {
+      "pair": "A-C",
+      "other_form": "C",
+      "qid": "Q2",
+      "question": "最多同时运行几个 subagents?(数字)",
+      "equivalent": true,
+      "reason": "数字一致，核心结论相同"
+    },
+    {
+      "pair": "A-C",
+      "other_form": "C",
+      "qid": "Q3",
+      "question": "选择架构时,什么时候才考虑 planner/executor 或 multi-agent?",
+      "equivalent": true,
+      "reason": "核心结论一致，细节略有不同"
+    },
+    {
+      "pair": "A-C",
+      "other_form": "C",
+      "qid": "Q4",
+      "question": "skill 说调试时应该 patch 哪一层?",
+      "equivalent": true,
+      "reason": "核心结论一致，步骤相同"
+    },
+    {
+      "pair": "A-C",
+      "other_form": "C",
+      "qid": "Q5",
+      "question": "首次发布前必须完成哪些最低要求中的两项即可,任举两项",
+      "equivalent": true,
+      "reason": "核心结论一致，数字和列表项集合相同"
+    }
+  ],
+  "rates": {
+    "A-B": {
+      "equivalent": 5,
+      "not_equivalent": 0,
+      "errors": 0,
+      "rate": 1.0
+    },
+    "A-C": {
+      "equivalent": 5,
+      "not_equivalent": 0,
+      "errors": 0,
+      "rate": 1.0
+    }
+  }
+}

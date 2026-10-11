@@ -258,5 +258,18 @@ def parse_crewai(config_dir: Union[str, Path]) -> AgentIR:
             # 全部 agent 名记入 metadata,不静默丢弃
             "agents_all": [str(k) for k in agents_data.keys()],
             "agents_count": len(agents_data),
+            # agents:全部角色的定义(name/role/goal),供 workflow 节点携带
+            # "谁以什么角色做这步"的语义(语义审计 P1:此前只有名单,
+            # 角色定义在 agent→workflow 时丢失)。backstory 太长不入,正文
+            # 在各 agent 原文件里。
+            "agents": [
+                {
+                    "name": str(k),
+                    "role": str((v if isinstance(v, dict) else {}).get("role") or ""),
+                    "goal": str((v if isinstance(v, dict) else {}).get("goal") or ""),
+                }
+                for k, v in agents_data.items()
+                if isinstance(v, dict)
+            ],
         },
     )
