@@ -1,0 +1,4849 @@
+{
+  "benchmark": "source-independent-preservation-v1",
+  "measures": "AgentIR field equality plus exact file paths, SHA-256, byte counts and POSIX modes",
+  "scope": "Archival/capsule preservation; native projection and execution equivalence are separate.",
+  "formats": [
+    "autogen",
+    "claude-subagent",
+    "crewai",
+    "crewai-skills",
+    "deepagents",
+    "generic",
+    "langchain",
+    "langflow",
+    "mermaid-workflow",
+    "n8n",
+    "openai"
+  ],
+  "cycles": 10,
+  "variants": {
+    "minimal": {
+      "source_deleted_before_emit": true,
+      "source_files": 1,
+      "source_bytes": 464,
+      "matrix": [
+        {
+          "chain": [
+            "autogen",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        }
+      ],
+      "long_chain": {
+        "chain": [
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai"
+        ],
+        "ok": true,
+        "ir_failures": [],
+        "missing_files": [],
+        "changed_files": [],
+        "extra_files": []
+      },
+      "matrix_passed": 121,
+      "matrix_total": 121
+    },
+    "bundle": {
+      "source_deleted_before_emit": true,
+      "source_files": 11,
+      "source_bytes": 5146,
+      "matrix": [
+        {
+          "chain": [
+            "autogen",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        }
+      ],
+      "long_chain": {
+        "chain": [
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai"
+        ],
+        "ok": true,
+        "ir_failures": [],
+        "missing_files": [],
+        "changed_files": [],
+        "extra_files": []
+      },
+      "matrix_passed": 121,
+      "matrix_total": 121
+    },
+    "contracts": {
+      "source_deleted_before_emit": true,
+      "source_files": 11,
+      "source_bytes": 5820,
+      "matrix": [
+        {
+          "chain": [
+            "autogen",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "autogen",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "claude-subagent",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "crewai-skills",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "deepagents",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "generic",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langchain",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "langflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "mermaid-workflow",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "n8n",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "autogen"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "claude-subagent"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "crewai-skills"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "deepagents"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "generic"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langchain"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "langflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "mermaid-workflow"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "n8n"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        },
+        {
+          "chain": [
+            "openai",
+            "openai"
+          ],
+          "ok": true,
+          "ir_failures": [],
+          "missing_files": [],
+          "changed_files": [],
+          "extra_files": []
+        }
+      ],
+      "long_chain": {
+        "chain": [
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai",
+          "autogen",
+          "claude-subagent",
+          "crewai",
+          "crewai-skills",
+          "deepagents",
+          "generic",
+          "langchain",
+          "langflow",
+          "mermaid-workflow",
+          "n8n",
+          "openai"
+        ],
+        "ok": true,
+        "ir_failures": [],
+        "missing_files": [],
+        "changed_files": [],
+        "extra_files": []
+      },
+      "matrix_passed": 121,
+      "matrix_total": 121
+    }
+  },
+  "generated_at": "2026-10-28T19:20:38.073610+00:00",
+  "implementation_files": {
+    "cli.py": "c2a1280921ee8542deb25f561b50c14071f4201f95e06ef479d40a3489482c32",
+    "converter/__init__.py": "5e45d19cffbb06bc9caf4895f9a8d489cf20e5f8eeb398ce174bff465193eebc",
+    "converter/agent_workflow.py": "278a1a57c5b8bbd3f20618538d1a2106e36fa905a6f33a36655e017b631df399",
+    "converter/emitters/__init__.py": "620b7d7ba64b7605d64e45f700d7dab0db98eb06184e52944d2326b170100554",
+    "converter/emitters/autogen.py": "1e2686cc770edd3383c58ba410a07026d8900fe4bcefc26545f29a289407cc47",
+    "converter/emitters/claude_subagent.py": "b2ccdd13e65ee618daa70a3e1ab0cb6daf1fb20ea2608a521e3170e6aebaa17e",
+    "converter/emitters/crewai.py": "4a5e4108db0b18292bd8166223d5e157a81e353d7b1fbec737b604cb328d72a2",
+    "converter/emitters/crewai_skills.py": "ceed4e5ca7786abb2b4c29aceeae5f0de918967b9efbab1e9459a9dd6d6c038a",
+    "converter/emitters/deepagents.py": "9eb6094275c5502ca5d0b1463d44e435a0196ae9cdc94a916fdcdcd279ed0670",
+    "converter/emitters/generic.py": "d39944c721301f1a7e4923ace11dde15900cbfc3e633df5066095d3763c8357e",
+    "converter/emitters/langchain.py": "d0d802bd38020c368f53130bde05851425e47005bcf6959081d8811be25b0656",
+    "converter/emitters/langflow.py": "6f030f56539632b540024ce1bd32e45cfa81ecdf7c909f4b107ccd10b93bb374",
+    "converter/emitters/mermaid_workflow.py": "18b1605fbd44825190b99c553337bcd90aa50776fc05ee75ec1bb9dda31adb56",
+    "converter/emitters/n8n.py": "75b53450a695fc7bb8960aa8a21178568263aaa899f9a46f43bddfeae3ca21ed",
+    "converter/emitters/openai_agents.py": "8cf81842e9400b69df189bc6cb309176d0417860c1bcbd199816524cb084575a",
+    "converter/ir.py": "b15615b223ac25c8e60e33d5b9872b63f4a2983c59a8a21bce506e1dc144b030",
+    "converter/parsers/__init__.py": "7262cb220ff9c57115bdfa1acb5369cbcbfdbbc4c416d969ffbe12c0be161c70",
+    "converter/parsers/autogen.py": "6f0b5fd97965e6d058a3c8745bcb14c8b0971027464f86f84ea73e6c2f0f5f4f",
+    "converter/parsers/claude_subagent.py": "3726e84a4672955953ae2d9550f8527121cf214013b6f4016d9d1ad829c2439d",
+    "converter/parsers/crewai.py": "40418c32e55843625b968820bbd903eb7e410c5c30048ac2f35ffffa5f03e2e4",
+    "converter/parsers/crewai_skills.py": "134d56d942fe5ad4cfa6b35c71df33133c978a590ef9643547f370f9fbdc970a",
+    "converter/parsers/deepagents.py": "0d2e252b44f367df32c5228e2d7786f778d683df5e8a257f652b3ec9fe06d52c",
+    "converter/parsers/generic.py": "a4cd9f308667be6f03f0c22f18c32fdc0840df61530a360247d65b4309ce2345",
+    "converter/parsers/knowledge.py": "f219aba4c83e7ce39df3651a6620ed4e35a28082d628a5c17eb2b7754ed437f6",
+    "converter/parsers/langchain.py": "d5ac3133555b5d3429d49cdeb2d42d3f9c6cfbaec864c43b10a242149e8ccf03",
+    "converter/parsers/langflow.py": "660b651fdc8194b0f0e2a9d27d1e92b0ede581f2310ae8f54882ee9826fea7eb",
+    "converter/parsers/mermaid_workflow.py": "b74c26354ba8d0151c033b641be8e73fd8beddafae415beb5e5c86f686211fd9",
+    "converter/parsers/n8n.py": "34d37c60bdccd369a2a6b55540152ca0f3871f2d10e9f8d9d6f4d19bd3c9fa84",
+    "converter/parsers/openai.py": "d6ef1cc652bda006bcfba7f1cf6cf693dd9f3699ce04d34d887491e7e3013d56",
+    "converter/preservation.py": "cfcb9e53547e619fbb3b5052076580130238036fdf78ea87de18284868773edc",
+    "converter/skill_loader.py": "b33c78fdbf00f87029265c077cf61589eea5ba29f16dc25028d05fc02234b988",
+    "converter/skill_writer.py": "3ccedea12ba4d25a3514ebe186e6d80d2aa96d0bedec456183524519ad4d9b9f",
+    "converter/wiki.py": "3384ed2b69bec0bde08e16a02386d8aaf0516a20ce2a111fb6fafc2ff8fed2d8",
+    "converter/wir.py": "55d9277f3fae45ca7a737ecbff19945335380acf37ce18e11d8109e79d363c7c",
+    "converter/workflow_extract.py": "95077fcefa5cd7165b05615b85a5c5e6826567d379fa273ce17bda3a9fafc0b1"
+  },
+  "benchmark_sha256": "282c50f79de93cff4b4e54d1160e2679ec4c526da016fec37c1e65520319ab7e",
+  "integrity": {
+    "supported": true,
+    "passed": 66,
+    "total": 66,
+    "runs": [
+      {
+        "format": "autogen",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "autogen",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "autogen",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "autogen",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "autogen",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "autogen",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'autogen'"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "claude-subagent",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'claude-subagent'"
+      },
+      {
+        "format": "crewai",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "crewai",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'crewai'"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "crewai-skills",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'crewai-skills'"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "deepagents",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'deepagents'"
+      },
+      {
+        "format": "generic",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "generic",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "generic",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "generic",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "generic",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "generic",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'generic'"
+      },
+      {
+        "format": "langchain",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langchain",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langchain",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langchain",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langchain",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "langchain",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'langchain'"
+      },
+      {
+        "format": "langflow",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langflow",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langflow",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langflow",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "langflow",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "langflow",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'langflow'"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "mermaid-workflow",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'mermaid-workflow'"
+      },
+      {
+        "format": "n8n",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "n8n",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "n8n",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "n8n",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "n8n",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "n8n",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'n8n'"
+      },
+      {
+        "format": "openai",
+        "mutation": "native-edit",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "openai",
+        "mutation": "native-delete",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "openai",
+        "mutation": "native-add",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "openai",
+        "mutation": "native-mode",
+        "ok": true,
+        "detected": "native artifacts changed (bytes, file set or permissions)"
+      },
+      {
+        "format": "openai",
+        "mutation": "ir-edit",
+        "ok": true,
+        "detected": "capsule IR SHA-256 mismatch"
+      },
+      {
+        "format": "openai",
+        "mutation": "format-mismatch",
+        "ok": true,
+        "detected": "capsule format is 'incorrect-format', requested 'openai'"
+      }
+    ]
+  },
+  "summary": {
+    "matrix_passed": 363,
+    "matrix_total": 363,
+    "long_chains_passed": 3,
+    "long_chain_hops_each": 110,
+    "integrity_passed": 66,
+    "integrity_total": 66
+  },
+  "ok": true
+}

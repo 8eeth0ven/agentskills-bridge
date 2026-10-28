@@ -7,9 +7,9 @@
 
 | 格式 | 官方真实样本 | 关键源码依据 |
 |---|---|---|
-| langflow | `src/lfx/tests/fixtures/starter_flows/v1.9.0/basic_prompting.json`(本地 clone `/tmp/langflow-repo`,main@1.12.5,与 1.6 starter 同构) | `src/lfx/src/lfx/graph/graph/base.py:2941-2951`(运行时逐键下标访问);`src/lfx/src/lfx/graph/vertex/base.py:250-270` |
-| openai | Codex `agents/openai.yaml` 三段结构(developers.openai.com/codex/skills) | `/tmp/codex-src/codex-rs/ext/skills/src/loader/metadata.rs`(SkillMetadataFile);`codex-rs/skills/src/interface.rs`(长度上限) |
-| claude-subagent | code.claude.com/docs/en/sub-agents(frontmatter 表 + skip 条件) | `/tmp/research/subagents-doc.txt:433/471/437`(name 约束)、`:437`(model 值域) |
+| langflow | `src/lfx/tests/fixtures/starter_flows/v1.9.0/basic_prompting.json`(langflow 官方仓库样本,main@1.12.5,与 1.6 starter 同构) | `src/lfx/src/lfx/graph/graph/base.py:2941-2951`(运行时逐键下标访问);`src/lfx/src/lfx/graph/vertex/base.py:250-270` |
+| openai | Codex `agents/openai.yaml` 三段结构(developers.openai.com/codex/skills) | `codex-rs/ext/skills/src/loader/metadata.rs`(SkillMetadataFile);`codex-rs/skills/src/interface.rs`(长度上限) |
+| claude-subagent | code.claude.com/docs/en/sub-agents(frontmatter 表 + skip 条件) | Claude Code sub-agents 官方文档当时摘录的 frontmatter 约束(name/model) |
 
 键分级标准(langflow):
 - **REQUIRED(导入/运行时必需)**:`node{id,position,type,data}` + `data{type,id,node}` + `data.node{base_classes,field_order,outputs,template._type}` + 字段 dict `{name,type,value}` + 边 `{source,target,sourceHandle,targetHandle}`——后端 `_create_vertex` 逐键下标读取,缺即 KeyError/ValueError。
@@ -79,4 +79,4 @@ frontmatter 硬约束逐条核(前 → 后):
 
 - 新增:`evaluation/schema_diff.py`
 - 修改:`converter/emitters/langflow.py`、`converter/emitters/openai_agents.py`、`converter/emitters/claude_subagent.py`
-- 快照:`/tmp/schema/diff_before.json`、`/tmp/schema/diff_after.json`
+- 当次运行曾生成 `diff_before.json` / `diff_after.json` 临时快照；这些历史快照未随仓库保存。当前复现可显式指定 `--json <path>`。

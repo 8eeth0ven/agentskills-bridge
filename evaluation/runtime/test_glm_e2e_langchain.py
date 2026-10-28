@@ -17,13 +17,13 @@
 learning / Interview preparation / Project delivery / Debugging or review)——
 回答命中任一模式词即证明产物 system prompt 真实注入并被模型读到。
 
-环境变量(经 /tmp/glm_keys.env source,不落仓库):
+环境变量(仅显式进程环境,不读取本机配置文件):
     GLM_API_KEY / GLM_BASE_URL / GLM_MODEL               —— OpenAI 兼容路径
     GLM_ANTHROPIC_BASE_URL / GLM_ANTHROPIC_MODEL         —— Anthropic 兼容路径
 缺 GLM_API_KEY 时整类 skipTest。
 
 运行方式(项目根目录):
-    source /tmp/glm_keys.env && /tmp/venv-lc/bin/python -m unittest \
+    python3 -m unittest \
         evaluation.runtime.test_glm_e2e_langchain -v
 
 实测备注(2026-10):
@@ -57,8 +57,10 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-OUT_LANGCHAIN = Path("/tmp/e2e/langchain")
-OUT_DEEPAGENTS = Path("/tmp/e2e/deepagents")
+from evaluation.runtime._artifacts import artifact_root
+
+OUT_LANGCHAIN: Path
+OUT_DEEPAGENTS: Path
 
 QUESTION = "这个 skill 有哪几种 Response Modes?只列名字"
 # 命中任一即证明 SYSTEM_PROMPT 真实生效(小写匹配,容忍模型改大小写)
@@ -142,17 +144,22 @@ class GlmE2ELangChainTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         if not os.environ.get("GLM_API_KEY"):
-            raise unittest.SkipTest("缺 GLM_API_KEY(source /tmp/glm_keys.env),整类跳过")
+            raise unittest.SkipTest("缺 GLM_API_KEY,整类跳过")
         for pkg in ("langchain", "langchain_openai", "langchain_anthropic", "deepagents"):
             try:
                 __import__(pkg)
             except Exception as exc:
                 raise unittest.SkipTest(f"{pkg} 不可 import:{exc}")
-        for artifact in (OUT_LANGCHAIN / "agent.py", OUT_DEEPAGENTS / "agent.py"):
-            if not artifact.is_file():
-                raise unittest.SkipTest(
-                    f"产物不存在:{artifact}——先跑 cli.py skill2agent 生成"
-                )
+        from converter.emitters import EMITTERS
+        from converter.skill_loader import load_skill
+
+        global OUT_LANGCHAIN, OUT_DEEPAGENTS
+        artifacts = artifact_root(cls)
+        OUT_LANGCHAIN = artifacts / "langchain"
+        OUT_DEEPAGENTS = artifacts / "deepagents"
+        ir = load_skill(PROJECT_ROOT / "examples" / "agent-fullcycle-engineering")
+        EMITTERS["langchain"](ir, OUT_LANGCHAIN)
+        EMITTERS["deepagents"](ir, OUT_DEEPAGENTS)
 
     # ---------- 公共辅助 ----------
 
@@ -167,9 +174,9 @@ class GlmE2ELangChainTest(unittest.TestCase):
         from langchain_openai import ChatOpenAI
 
         return ChatOpenAI(
-            model=os.environ["GLM_MODEL"],
+            model=os.environ.get("GLM_MODEL", "glm-4-flash"),
             api_key=os.environ["GLM_API_KEY"],
-            base_url=os.environ["GLM_BASE_URL"],
+            base_url=os.environ.get("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
             max_tokens=max_tokens,
         )
 
@@ -179,9 +186,9 @@ class GlmE2ELangChainTest(unittest.TestCase):
         from langchain_anthropic import ChatAnthropic
 
         return ChatAnthropic(
-            model=os.environ["GLM_ANTHROPIC_MODEL"],
+            model=os.environ.get("GLM_ANTHROPIC_MODEL", "glm-5.3-flash"),
             api_key=os.environ["GLM_API_KEY"],
-            base_url=os.environ["GLM_ANTHROPIC_BASE_URL"],
+            base_url=os.environ.get("GLM_ANTHROPIC_BASE_URL", "https://open.bigmodel.cn/api/anthropic"),
             max_tokens=max_tokens,
         )
 
@@ -269,9 +276,9 @@ class GlmE2ELangChainTest(unittest.TestCase):
             module = self._load_module(OUT_DEEPAGENTS / "agent.py", "e2e_da_openai")
             cls = _flattening_chat_openai_cls()
             llm = cls(
-                model=os.environ["GLM_MODEL"],
+                model=os.environ.get("GLM_MODEL", "glm-4-flash"),
                 api_key=os.environ["GLM_API_KEY"],
-                base_url=os.environ["GLM_BASE_URL"],
+                base_url=os.environ.get("GLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4"),
                 max_tokens=512,
             )
             agent = module.build_agent(model=llm)

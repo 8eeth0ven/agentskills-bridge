@@ -1,42 +1,36 @@
 # 参与贡献
 
-欢迎 Issue、Discussion 和 PR,中英文都可以。小改动不需要完美——测试全绿就发上来,格式细节可以在 review 里一起磨。
+欢迎中英文 Issue 与 PR。Python ≥3.10，转换引擎无强制第三方依赖；静态与保真测试无需 API key。
 
-## 环境
-
-Python ≥3.10,零强制依赖。clone 后直接:
+## 本地验证
 
 ```bash
-python3 -m unittest discover tests    # 70 用例应全绿
-python3 evaluation/run_eval.py        # 27 链评测应为全 1.0000
+python3 -m unittest discover tests -q
+python3 evaluation/run_eval.py
+python3 evaluation/benchmark_preservation.py
+python3 cli.py wiki verify
 ```
 
-## 加一个新框架 target(最小路径)
+严格资源评测逐文件检查 SHA-256、字节数与 POSIX mode，执行前删除源目录。基准结果、输入范围和限制见 [开源对照报告](evaluation/ECOSYSTEM-COMPARISON.md)。合法编辑与完整性回归见 `tests/test_preservation_edits.py`、`tests/test_fidelity_adversarial.py`。
 
-转换引擎以 `converter/ir.py` 的 **AgentIR** 为枢纽,新增一个框架只需要一对函数(契约详见 [INTERFACE.md](INTERFACE.md)):
+## 添加格式
 
-1. `converter/emitters/<fmt>.py` — `emit_<fmt>(ir: AgentIR, out_dir) -> Path`,IR → 框架格式;
-2. `converter/parsers/<fmt>.py` — `parse_<fmt>(path) -> AgentIR`,框架格式 → IR(best-effort,容错第三方真实输入);
-3. 在 `emitters/__init__.py`、`parsers/__init__.py` 注册,`ir.py` 的 `TARGET_FORMATS` 加名字;
-4. `tests/` 加用例:产物断言 + emit→parse→write_skill→load_skill roundtrip(knowledge 文件名与内容一致);
-5. (欢迎)`llm-wiki/03-frameworks/<fmt>.md` 写一章:最小示例 / 字段表 / IR 映射 / 有损点。
+实现一对原生 parser / emitter，注册到两侧的 `PARSERS` / `EMITTERS` 和 `TARGET_FORMATS`，CLI 自动使用注册格式。公开契约见 [INTERFACE.md](INTERFACE.md)。
 
-roundtrip 保真是硬约束:新链路的 name / description / system_prompt / knowledge 应做到归一化后一致(参考 `evaluation/run_eval.py` 的指标)。
+为两种性质分别加测试：直接调用模块函数，验证目标真实字段映射；通过公开注册表，验证完整 IR、原始资源以及损坏检测。完整 capsule 回读不应替代原生格式或真实引擎验证。生成的 Python 只能用 AST 等静态方式解析，导入外部源文件会执行其代码。
 
-## llm-wiki 维护
+## 知识库维护
 
-wiki 是只读知识库(MANIFEST.sha256 保护)。修改三步:
+`llm-wiki/` 的清单受 SHA-256 校验。维护者更新章节后，重新生成清单并恢复只读权限：
 
 ```bash
 chmod -R u+w llm-wiki/
-# …编辑章节…
+# 编辑需要更新的章节
 python3 -c "from converter.wiki import Wiki; from pathlib import Path; Path('llm-wiki/MANIFEST.sha256').write_text(Wiki('llm-wiki').build_manifest(), encoding='utf-8')"
-chmod -R a-w llm-wiki/ && python3 cli.py wiki verify
+chmod -R a-w llm-wiki/
+python3 cli.py wiki verify
 ```
 
-## PR 自检清单
+## 提交前
 
-- [ ] `python3 -m unittest discover tests` 全绿
-- [ ] `python3 evaluation/run_eval.py` 无回归(新增格式需纳入矩阵)
-- [ ] `python3 cli.py wiki verify` 通过(若改了 wiki)
-- [ ] 密钥/本机路径不入库(测试只读环境变量)
+确认测试通过，文档承诺与实测范围一致。密钥只通过环境变量注入，不读取固定本地密钥文件；临时输出用临时目录，持久化报告不记录本机绝对路径。真实框架、模型、网络与外部语料测试单独记录依赖、版本、样本和跳过原因。

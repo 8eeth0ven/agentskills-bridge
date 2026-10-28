@@ -4,7 +4,7 @@
     ChatInput --message--> Prompt --prompt(system_message)--> LanguageModelComponent
     LanguageModelComponent --text_output--> ChatOutput
 
-格式要点(依据 langflow main@1.12.5 调研,/tmp/research/langflow-skills.md):
+格式要点(依据 langflow main@1.12.5 官方源码与 starter fixtures 调研):
     - reactflow 外层 type="genericNode",id = "{PascalCaseType}-{5位随机}";
     - data.type 为 PascalCase 短类名(ChatInput/Prompt/LanguageModelComponent/ChatOutput);
     - handle 字符串 = json.dumps 后 '"'→'œ'(U+0153),边 data 里另附结构化对象(官方双写);

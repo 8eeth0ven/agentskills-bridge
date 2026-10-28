@@ -1,6 +1,6 @@
 """外部真实 corpus 泛化测试(全部输入来自第三方,非本项目 emitter 产物)。
 
-    python3 evaluation/external/run_external.py
+    python3 evaluation/external/run_external.py --corpus-root <corpus> [--out-dir <results>]
 
 数据流(两个方向):
   agent→skill(真实 agent 输入)
@@ -16,11 +16,13 @@
       → crewai / langflow / claude-subagent / generic 四链 parse 回
       → F_name/F_desc/F_prompt(复用 evaluation/metrics.py)
 
-产物:evaluation/external/results.json + results.md(含兼容修复记录)。
+产物:默认写入 evaluation/external/latest/；历史 results.json/results.md 保留。
+语料须由调用者明确指定，不自动查找本机 clone。
 """
 
 from __future__ import annotations
 
+import argparse
 import json
 import shutil
 import sys
@@ -42,44 +44,43 @@ from converter.parsers import PARSERS  # noqa: E402
 from converter.skill_loader import load_skill  # noqa: E402
 from converter.skill_writer import write_skill  # noqa: E402
 
-RUN_DATE = "2026-10-11"
-EXT = Path("/tmp/ext")
+RUN_DATE = date.today().isoformat()
 
 # --------------------------------------------------------------------------
 # 真实输入清单(全部第三方仓库;缺失时该行标 missing,不崩)
 # --------------------------------------------------------------------------
 
 CREWAI_PROJECTS: List[Tuple[str, Path]] = [
-    ("game-builder-crew", EXT / "crewai-examples" / "crews" / "game-builder-crew"),
-    ("landing_page_generator", EXT / "crewai-examples" / "crews" / "landing_page_generator"),
-    ("marketing_strategy", EXT / "crewai-examples" / "crews" / "marketing_strategy"),
-    ("recruitment", EXT / "crewai-examples" / "crews" / "recruitment"),
+    ("game-builder-crew", Path("crewai-examples") / "crews" / "game-builder-crew"),
+    ("landing_page_generator", Path("crewai-examples") / "crews" / "landing_page_generator"),
+    ("marketing_strategy", Path("crewai-examples") / "crews" / "marketing_strategy"),
+    ("recruitment", Path("crewai-examples") / "crews" / "recruitment"),
 ]
 
 SKILL_DIRS: List[Tuple[str, Path]] = [
-    ("docx", EXT / "anthropic-skills" / "skills" / "docx"),
-    ("pdf", EXT / "anthropic-skills" / "skills" / "pdf"),
-    ("pptx", EXT / "anthropic-skills" / "skills" / "pptx"),
+    ("docx", Path("anthropic-skills") / "skills" / "docx"),
+    ("pdf", Path("anthropic-skills") / "skills" / "pdf"),
+    ("pptx", Path("anthropic-skills") / "skills" / "pptx"),
 ]
 
 LANGFLOW_FLOWS: List[Tuple[str, Path]] = [
-    ("basic_prompting@1.9.0", EXT / "langflow-repo" / "src" / "lfx" / "tests"
+    ("basic_prompting@1.9.0", Path("langflow-repo") / "src" / "lfx" / "tests"
         / "fixtures" / "starter_flows" / "v1.9.0" / "basic_prompting.json"),
-    ("research_agent@1.9.0", EXT / "langflow-repo" / "src" / "lfx" / "tests"
+    ("research_agent@1.9.0", Path("langflow-repo") / "src" / "lfx" / "tests"
         / "fixtures" / "starter_flows" / "v1.9.0" / "research_agent.json"),
-    ("meeting_summary@1.9.0", EXT / "langflow-repo" / "src" / "lfx" / "tests"
+    ("meeting_summary@1.9.0", Path("langflow-repo") / "src" / "lfx" / "tests"
         / "fixtures" / "starter_flows" / "v1.9.0" / "meeting_summary.json"),
-    ("pokedex_agent@1.6.0", EXT / "langflow-repo" / "src" / "lfx" / "tests"
+    ("pokedex_agent@1.6.0", Path("langflow-repo") / "src" / "lfx" / "tests"
         / "data" / "starter_projects_1_6_0" / "Pokédex Agent.json"),
 ]
 
 # 真实 Claude Code subagent(wshobson/agents 集合),组装成 .claude/agents/ 目录
 SUBAGENT_SOURCES: List[Tuple[str, Path]] = [
-    ("backend-architect", EXT / "wshobson-agents" / "plugins"
+    ("backend-architect", Path("wshobson-agents") / "plugins"
         / "backend-development" / "agents" / "backend-architect.md"),
-    ("eval-judge", EXT / "wshobson-agents" / "plugins"
+    ("eval-judge", Path("wshobson-agents") / "plugins"
         / "plugin-eval" / "agents" / "eval-judge.md"),
-    ("image-generator", EXT / "wshobson-agents" / "plugins"
+    ("image-generator", Path("wshobson-agents") / "plugins"
         / "meigen-ai-design" / "agents" / "image-generator.md"),
 ]
 
@@ -129,23 +130,37 @@ COMPAT_NOTES: List[Tuple[str, str]] = [
 ]
 
 
-def _tb_first(exc: BaseException) -> str:
+def _tb_first(exc: BaseException, corpus_root: Path, work: Path) -> str:
     """异常摘要:traceback 首行 + 异常类型与消息。"""
     tb = traceback.extract_tb(exc.__traceback__)
-    first = f"{tb[0].filename}:{tb[0].lineno} in {tb[0].name}" if tb else ""
-    return f"{first}: {type(exc).__name__}: {exc}"[:300]
+    if tb:
+        try:
+            source = Path(tb[0].filename).resolve().relative_to(ROOT).as_posix()
+        except ValueError:
+            source = Path(tb[0].filename).name
+        first = f"{source}:{tb[0].lineno} in {tb[0].name}"
+    else:
+        first = ""
+    message = str(exc)
+    replacements = ((str(ROOT.resolve()), "<project>"),
+                    (str(corpus_root.resolve()), "<corpus>"),
+                    (str(work.resolve()), "<work>"))
+    for private, public in sorted(replacements, key=lambda item: len(item[0]), reverse=True):
+        message = message.replace(private, public)
+    return f"{first}: {type(exc).__name__}: {message}"[:300]
 
 
-def assemble_subagents() -> List[Tuple[str, Path]]:
+def assemble_subagents(corpus_root: Path, work: Path) -> List[Tuple[str, Path]]:
     """把真实 subagent md 组装成 parse_claude_subagent 需要的目录形态。
 
-    /tmp/ext/assembled/<key>/.claude/agents/<原名>.md
+    <work>/assembled/<key>/.claude/agents/<原名>.md
     """
     out: List[Tuple[str, Path]] = []
-    for key, src in SUBAGENT_SOURCES:
+    for key, relative in SUBAGENT_SOURCES:
+        src = corpus_root / relative
         if not src.is_file():
             continue
-        dst_dir = EXT / "assembled" / key / ".claude" / "agents"
+        dst_dir = work / "assembled" / key / ".claude" / "agents"
         dst_dir.mkdir(parents=True, exist_ok=True)
         dst = dst_dir / src.name
         shutil.copy2(src, dst)
@@ -157,14 +172,14 @@ def assemble_subagents() -> List[Tuple[str, Path]]:
 # Stage A:agent→skill(真实 agent 输入)
 # --------------------------------------------------------------------------
 
-def run_agent_to_skill(work: Path) -> List[dict]:
+def run_agent_to_skill(work: Path, corpus_root: Path) -> List[dict]:
     rows: List[dict] = []
     inputs: List[Tuple[str, str, Path]] = []
     for key, path in CREWAI_PROJECTS:
-        inputs.append((key, "crewai", path))
+        inputs.append((key, "crewai", corpus_root / path))
     for key, path in LANGFLOW_FLOWS:
-        inputs.append((key, "langflow", path))
-    for key, path in assemble_subagents():
+        inputs.append((key, "langflow", corpus_root / path))
+    for key, path in assemble_subagents(corpus_root, work):
         inputs.append((key, "claude-subagent", path))
 
     for key, fmt, path in inputs:
@@ -187,7 +202,7 @@ def run_agent_to_skill(work: Path) -> List[dict]:
         try:
             ir = PARSERS[fmt](path)
         except Exception as exc:  # noqa: BLE001 - 真实输入的任何异常都记录
-            row["error"] = _tb_first(exc)
+            row["error"] = _tb_first(exc, corpus_root, work)
             continue
         row.update(
             parse_ok=True,
@@ -209,7 +224,7 @@ def run_agent_to_skill(work: Path) -> List[dict]:
             if not ir2.name:
                 raise ValueError("回读 name 为空")
         except Exception as exc:  # noqa: BLE001
-            row["write_load_error"] = _tb_first(exc)
+            row["write_load_error"] = _tb_first(exc, corpus_root, work)
             continue
         row["write_load_ok"] = True
     return rows
@@ -219,11 +234,12 @@ def run_agent_to_skill(work: Path) -> List[dict]:
 # Stage B:skill→agent(真实 skill 输入)
 # --------------------------------------------------------------------------
 
-def run_skill_to_agent(work: Path) -> Tuple[List[dict], List[dict]]:
+def run_skill_to_agent(work: Path, corpus_root: Path) -> Tuple[List[dict], List[dict]]:
     forward_rows: List[dict] = []
     back_rows: List[dict] = []
 
-    for key, skill_dir in SKILL_DIRS:
+    for key, relative in SKILL_DIRS:
+        skill_dir = corpus_root / relative
         if not (skill_dir / "SKILL.md").is_file():
             forward_rows.append({"skill": key, "target": "-", "v_format": 0,
                                  "error": "missing-input", "L": []})
@@ -232,7 +248,7 @@ def run_skill_to_agent(work: Path) -> Tuple[List[dict], List[dict]]:
             ir_in = load_skill(skill_dir)
         except Exception as exc:  # noqa: BLE001
             forward_rows.append({"skill": key, "target": "-", "v_format": 0,
-                                 "error": f"load-error: {_tb_first(exc)}", "L": []})
+                                 "error": f"load-error: {_tb_first(exc, corpus_root, work)}", "L": []})
             continue
 
         for target, emit_fn in EMITTERS.items():
@@ -243,7 +259,7 @@ def run_skill_to_agent(work: Path) -> Tuple[List[dict], List[dict]]:
             try:
                 emit_fn(ir_in, agent_dir)
             except Exception as exc:  # noqa: BLE001
-                frow["error"] = f"emit-error: {_tb_first(exc)}"
+                frow["error"] = f"emit-error: {_tb_first(exc, corpus_root, work)}"
                 frow["v_reasons"] = [frow["error"]]
             else:
                 frow["v_format"], frow["v_reasons"] = M.validate_forward(target, agent_dir)
@@ -274,7 +290,7 @@ def run_skill_to_agent(work: Path) -> Tuple[List[dict], List[dict]]:
                 ir_mid = parser(entry_path)
             except Exception as exc:  # noqa: BLE001
                 brow["status"] = "parse-error"
-                brow["error"] = _tb_first(exc)
+                brow["error"] = _tb_first(exc, corpus_root, work)
                 continue
             brow["F_name"] = M.f_name(ir_in, ir_mid)
             brow["F_desc"] = M.f_desc(ir_in, ir_mid)
@@ -370,13 +386,21 @@ def build_markdown(a_rows: List[dict], fwd: List[dict], back: List[dict]) -> str
 
 
 def main() -> int:
-    out_dir = EVAL_DIR
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--corpus-root", type=Path, required=True,
+                        help="Directory containing crewai-examples, anthropic-skills, langflow-repo and wshobson-agents")
+    parser.add_argument("--out-dir", type=Path, default=EVAL_DIR / "latest",
+                        help="Fresh results directory; historical reports are not overwritten by default")
+    args = parser.parse_args()
+    if not args.corpus_root.is_dir():
+        parser.error("--corpus-root must be an existing corpus directory")
+    out_dir = args.out_dir
     out_dir.mkdir(parents=True, exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix="ext-eval-") as tmp:
         work = Path(tmp)
-        a_rows = run_agent_to_skill(work)
-        fwd, back = run_skill_to_agent(work)
+        a_rows = run_agent_to_skill(work, args.corpus_root)
+        fwd, back = run_skill_to_agent(work, args.corpus_root)
 
     results = {
         "meta": {

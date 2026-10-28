@@ -13,15 +13,17 @@
   - 每形态每题各调一次 {GLM_BASE_URL}chat/completions(失败重试 1 次,仍失败记录错误)
   - judge(同模型)对 (A 答, X 答) 与原问题只输出 JSON {"equivalent":bool,"reason":"≤30字"}
   - 不一致(含判定错误)时:双方答案摘录各 100 字 + judge reason 完整落盘
-  - 产出 results.md / results.json(与本脚本同目录)
+  - 默认产出 latest/results.md / results.json，保留同目录的历史证据
 
 运行:
-  source /tmp/glm_keys.env && python3 evaluation/behavior/probe_behavior.py
+  python3 evaluation/behavior/probe_behavior.py [--out-dir <results>]
+  GLM_API_KEY / GLM_BASE_URL 仅从明确设置的进程环境读取，不加载密钥文件。
 仅标准库;GLM_API_KEY 缺失时整体 skip 并 exit 0。
 """
 
 from __future__ import annotations
 
+import argparse
 import concurrent.futures as cf
 import json
 import os
@@ -32,13 +34,14 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-OUT_DIR = Path(__file__).resolve().parent
+OUT_DIR = Path(__file__).resolve().parent / "latest"
 SKILL_MD = ROOT / "examples" / "agent-fullcycle-engineering" / "SKILL.md"
 
-DATE = "2026-10-11"
+DATE = date.today().isoformat()
 TEMPERATURE = 0.2
 MAX_TOKENS = 600
 TIMEOUT = 120
@@ -107,20 +110,22 @@ def build_forms() -> dict[str, str]:
     """A: 原 SKILL.md 正文;B/C: 现场转换产物。返回 {form: system_prompt}。"""
     forms = {"A": strip_frontmatter(SKILL_MD.read_text(encoding="utf-8"))}
 
-    tmp = Path(tempfile.mkdtemp(prefix="behavior_prods_"))
-    for target in ("crewai", "n8n"):
-        cmd = [sys.executable, "cli.py", "skill2agent",
-               "examples/agent-fullcycle-engineering",
-               "--target", target, "--out", str(tmp / target)]
-        r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
-        if r.returncode != 0:
-            raise RuntimeError(f"skill2agent {target} failed: {r.stderr.strip()[:300]}")
+    with tempfile.TemporaryDirectory(prefix="bridge-behavior-") as directory:
+        tmp = Path(directory)
+        for target in ("crewai", "n8n"):
+            cmd = [sys.executable, "cli.py", "skill2agent",
+                   "examples/agent-fullcycle-engineering",
+                   "--target", target, "--out", str(tmp / target)]
+            r = subprocess.run(cmd, cwd=ROOT, capture_output=True, text=True)
+            if r.returncode != 0:
+                raise RuntimeError(f"skill2agent {target} failed: {r.stderr.strip()[:300]}")
 
-    crew_yaml = (tmp / "crewai" / "config" / "agents.yaml").read_text(encoding="utf-8")
-    forms["B"] = yaml_literal_block(crew_yaml, "backstory")
+        crew_yaml = (tmp / "crewai" / "config" / "agents.yaml").read_text(encoding="utf-8")
+        forms["B"] = yaml_literal_block(crew_yaml, "backstory")
 
-    wf = json.loads((tmp / "n8n" / "workflow.json").read_text(encoding="utf-8"))
-    forms["C"] = wf["x-source-skill"]["systemPrompt"].strip()
+        wf = json.loads((tmp / "n8n" / "workflow.json").read_text(encoding="utf-8"))
+        forms["C"] = wf["x-source-skill"]["systemPrompt"].strip()
+
     return forms
 
 
@@ -150,14 +155,15 @@ def chat_messages(messages: list[dict], api_key: str, base_url: str, model: str,
             return data["choices"][0]["message"]["content"]
         except (urllib.error.URLError, urllib.error.HTTPError, TimeoutError,
                 KeyError, IndexError, json.JSONDecodeError) as e:
-            last_err = e
+            last_err = RuntimeError(str(e).replace(api_key, "<redacted>"))
             body = ""
             if isinstance(e, urllib.error.HTTPError):
                 try:
                     body = e.read().decode("utf-8", "replace")[:200]
                 except Exception:
                     pass
-            print(f"  [warn] api attempt {attempt + 1} failed: {e} {body}", file=sys.stderr)
+            safe_body = body.replace(api_key, "<redacted>")
+            print(f"  [warn] api attempt {attempt + 1} failed: {last_err} {safe_body}", file=sys.stderr)
     raise RuntimeError(f"API failed after retry: {last_err}")
 
 
@@ -213,6 +219,11 @@ def judge(a_ans: str, x_ans: str, question: str, *, api_key: str,
 # ---------------------------------------------------------------- 主流程
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--out-dir", type=Path, default=OUT_DIR,
+                        help="Fresh results directory; historical evidence is preserved by default")
+    args = parser.parse_args()
+    out_dir = args.out_dir
     api_key = os.environ.get("GLM_API_KEY", "").strip()
     base_url = os.environ.get("GLM_BASE_URL", "").strip()
     model = os.environ.get("GLM_MODEL", "glm-4-flash").strip()
@@ -220,6 +231,7 @@ def main() -> int:
         print("[skip] GLM_API_KEY / GLM_BASE_URL 缺失,L3 行为等价实测跳过(exit 0)")
         return 0
 
+    out_dir.mkdir(parents=True, exist_ok=True)
     ctx = {"api_key": api_key, "base_url": base_url, "model": model}
     qmap = dict(QUESTIONS)
 
@@ -353,7 +365,7 @@ def main() -> int:
                          else mt_answers["C"]["R1b"]["error"]),
             } for j in mismatches],
     }
-    (OUT_DIR / "results.json").write_text(
+    (out_dir / "results.json").write_text(
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     md = ["# L3 行为等价实测结果", "",
@@ -417,7 +429,7 @@ def main() -> int:
             md.append("")
     else:
         md += ["## 不一致明细", "", "无:全部判定等价。", ""]
-    (OUT_DIR / "results.md").write_text("\n".join(md), encoding="utf-8")
+    (out_dir / "results.md").write_text("\n".join(md), encoding="utf-8")
 
     print("\n===== L3 行为等价实测汇总(v2) =====")
     for pair in ("A-B", "A-C"):
@@ -438,7 +450,7 @@ def main() -> int:
                   f"| {m['reason']}")
     n_ok = sum(1 for j in judgments if j["equivalent"] is not None)
     n_all = len(single_js) + len(mt_js)
-    print(f"判定完成 {n_ok}/{n_all};结果: {OUT_DIR / 'results.md'}")
+    print(f"判定完成 {n_ok}/{n_all};结果: {out_dir / 'results.md'}")
     return 0 if n_ok == n_all else 1
 
 

@@ -1,11 +1,10 @@
 """schema 深度一致性校验:三格式产物 vs 官方真实 schema 逐字段比对。
 
-    python3 evaluation/schema_diff.py [--json <path>]
+    python3 evaluation/schema_diff.py [--official-flow <fixture.json>] [--offline] [--json <path>]
 
 比对对象:
     langflow        我们的 flow.json vs 官方 starter flow 真实 JSON
-                    (basic_prompting.json,来源:/tmp/langflow-repo 本地 clone
-                     -> /tmp/ext clone -> 代理 curl -> 调研报告摘录结构回退)
+                    (basic_prompting.json:显式 --official-flow 输入、官方 URL、内置结构摘录回退)
     openai          我们的 agents/openai.yaml vs Codex 官方三段结构
                     (interface/policy/dependencies,codex-rs 源码证据)
     claude-subagent 我们的 .claude/agents/*.md vs Claude Code subagent 硬约束
@@ -28,10 +27,10 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import subprocess
 import sys
+import tempfile
 import urllib.request
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Tuple
@@ -41,17 +40,12 @@ ROOT = EVAL_DIR.parent
 sys.path.insert(0, str(ROOT))
 
 EXAMPLE_SKILL = ROOT / "examples" / "agent-fullcycle-engineering"
-OUT_ROOT = Path("/tmp/schema")
 
 OFFICIAL_FLOW_URL = (
     "https://raw.githubusercontent.com/langflow-ai/langflow/main/src/lfx/tests/"
     "fixtures/starter_flows/v1.9.0/basic_prompting.json"
 )
-_OFFICIAL_FLOW_CANDIDATES = [
-    "/tmp/langflow-repo/src/lfx/tests/fixtures/starter_flows/v1.9.0/basic_prompting.json",
-    "/tmp/ext/langflow-repo/src/lfx/tests/fixtures/starter_flows/v1.9.0/basic_prompting.json",
-    "/tmp/ext/langflow/src/lfx/tests/fixtures/starter_flows/v1.9.0/basic_prompting.json",
-]
+
 
 # ---------------------------------------------------------------- 分级表
 
@@ -104,29 +98,17 @@ CLAUDE_MODEL_VALUES = {"sonnet", "opus", "haiku", "fable", "inherit"}
 
 # ---------------------------------------------------------------- 官方样本
 
-def load_official_flow() -> Tuple[Optional[dict], str]:
-    """官方 starter flow:本地 clone -> 代理 curl -> 调研摘录结构回退。"""
-    for cand in _OFFICIAL_FLOW_CANDIDATES:
-        p = Path(cand)
-        if p.is_file():
-            try:
-                return json.loads(p.read_text(encoding="utf-8")), f"本地 clone {cand}"
-            except (json.JSONDecodeError, OSError):
-                continue
-    # 网络拉取(走本机代理)
-    proxy = "http://127.0.0.1:7897"
-    try:
-        env = dict(os.environ, https_proxy=proxy, http_proxy=proxy)
-        out = subprocess.run(
-            ["curl", "-sSL", "--max-time", "20", OFFICIAL_FLOW_URL],
-            capture_output=True, text=True, env=env, timeout=30,
-        )
-        if out.returncode == 0 and out.stdout.strip().startswith("{"):
-            return json.loads(out.stdout), f"curl {OFFICIAL_FLOW_URL}"
-    except (OSError, subprocess.SubprocessError, json.JSONDecodeError):
-        pass
-    # 回退:/tmp/research/langflow-skills.md §1 摘录结构(键集合层面等价)
-    return _official_flow_from_research(), "调研报告 langflow-skills.md §1 摘录(网络与 clone 均不可用)"
+def load_official_flow(official_flow: Optional[Path] = None, offline: bool = False) -> Tuple[Optional[dict], str]:
+    """Use only an explicitly supplied fixture, the official URL, or the embedded excerpt."""
+    if official_flow is not None:
+        return json.loads(official_flow.read_text(encoding="utf-8")), f"explicit fixture: {official_flow.name}"
+    if not offline:
+        try:
+            with urllib.request.urlopen(OFFICIAL_FLOW_URL, timeout=20) as response:
+                return json.loads(response.read()), f"official URL: {OFFICIAL_FLOW_URL}"
+        except (OSError, ValueError):
+            pass
+    return _official_flow_from_research(), "内置官方结构摘录(离线或官方样本下载不可用)"
 
 
 def _official_flow_from_research() -> dict:
@@ -187,12 +169,12 @@ def _official_flow_from_research() -> dict:
 
 # ---------------------------------------------------------------- 产物生成
 
-def _generate_targets() -> Dict[str, Optional[Path]]:
+def _generate_targets(out_root: Path) -> Dict[str, Optional[Path]]:
     """cli skill2agent 生成三格式产物;失败回退为直接调 emitter。"""
     out: Dict[str, Optional[Path]] = {}
     for target, key in (("langflow", "langflow"), ("openai", "openai"),
                         ("claude-subagent", "claude")):
-        dest = OUT_ROOT / key
+        dest = out_root / key
         try:
             r = subprocess.run(
                 [sys.executable, str(ROOT / "cli.py"), "skill2agent",
@@ -403,7 +385,7 @@ def diff_openai(out_dir: Path) -> Tuple[List[dict], List[dict]]:
             "finding": "Codex SkillMetadataFile(serde Deserialize,无 deny_unknown_fields)"
                        "对未知顶层键宽容忽略,不会拒载 openai.yaml;metadata 解析本身 fail-open"
                        "(解析失败仅 warn,不阻塞 SKILL.md 加载)。其余客户端不读取 agents/openai.yaml。",
-            "confidence": "高(源码直读 /tmp/codex-src/codex-rs/ext/skills/src/loader/metadata.rs)",
+            "confidence": "高(源码直读 codex-rs/ext/skills/src/loader/metadata.rs)",
         })
     return items, notes
 
@@ -508,10 +490,15 @@ def diff_claude(out_dir: Path) -> Tuple[List[dict], List[dict]]:
 
 # ---------------------------------------------------------------- 主流程
 
-def run(json_out: Optional[Path] = None) -> int:
-    official, official_src = load_official_flow()
+def run(json_out: Optional[Path] = None, *, official_flow: Optional[Path] = None, offline: bool = False) -> int:
+    with tempfile.TemporaryDirectory(prefix="bridge-schema-") as tmp:
+        return _run(Path(tmp), json_out, official_flow=official_flow, offline=offline)
+
+
+def _run(out_root: Path, json_out: Optional[Path], *, official_flow: Optional[Path], offline: bool) -> int:
+    official, official_src = load_official_flow(official_flow, offline)
     print(f"官方 langflow 样本来源:{official_src}")
-    targets = _generate_targets()
+    targets = _generate_targets(out_root)
 
     all_items: Dict[str, List[dict]] = {}
     all_notes: List[dict] = []
@@ -577,8 +564,10 @@ def run(json_out: Optional[Path] = None) -> int:
 def main(argv: List[str]) -> int:
     ap = argparse.ArgumentParser(description="三产物 vs 官方 schema 一致性校验")
     ap.add_argument("--json", help="结构化结果落盘路径(可选)")
+    ap.add_argument("--official-flow", type=Path, help="Explicit official Langflow fixture; no local clone discovery")
+    ap.add_argument("--offline", action="store_true", help="Use the embedded excerpt without network access")
     args = ap.parse_args(argv)
-    return run(Path(args.json) if args.json else None)
+    return run(Path(args.json) if args.json else None, official_flow=args.official_flow, offline=args.offline)
 
 
 if __name__ == "__main__":

@@ -1,5 +1,7 @@
 # 转换实例与评分总表(2026-10-11)
 
+> 以下为 2026-10-11 历史评测记录。2026-10-29 当前完整资产评测、固定开源对照与真实官方语料结果见 [ECOSYSTEM-COMPARISON.md](ECOSYSTEM-COMPARISON.md)；本轮没有重跑真实模型 API。
+
 agentskills-bridge 覆盖 **skill(声明式知识包)/ agent(可执行运行时定义)/ workflow(多步骤编排 DAG)三形态互转**,正向目标共 11 个:9 种 agent 格式(crewai、crewai-skills、deepagents、langchain、langflow、openai、claude-subagent、autogen、generic)+ 2 种 workflow 格式(n8n、mermaid-workflow)。截至 2026-10-11,3 语料 × 11 目标 = **33 条 roundtrip 链路的全部 8 项指标(F_name / F_desc / F_prompt / F_know_q / F_know_c / S_struct / S_terms / V_format)均为 1.0000,Loss 点 0 条**(数据源:`evaluation/results/results.md`);在此之上叠了三层活性验证:L3 行为等价一致率 100%、真实框架运行时 3 家 PASS(crewai 1.15.27 / langchain 1.4.4 / deepagents 0.7.23)、GLM 双协议真实模型端到端 9 链全绿,外部 14 份第三方真实语料 agent→skill 11/11、skill→agent 24/24——静态 → 语义 → 行为 → 运行时四层闭环。历史缺陷修复 R1–R16、语义审计 P1–P2 全记录见 `evaluation/REPORT.md`。
 
 ## 1. 实例总表(11 格式 × 每格式 3 语料链,共 33 链)

@@ -33,7 +33,7 @@ def _full_ir() -> AgentIR:
                 filename="guide.md",
                 title="Guide",
                 content="# Guide\ncontent",
-                source_path="/tmp/guide.md",
+                source_path="fixtures/guide.md",
             )
         ],
         tasks=[

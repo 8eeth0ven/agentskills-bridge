@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="640" viewBox="0 0 1280 640" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">agentskills-bridge — verified roundtrip conversion</title>
+  <desc id="desc">A source skill passes through AgentIR into native framework artifacts and a portable preservation capsule. The capsule carries the complete source for a verified return.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1280" y2="640" gradientUnits="userSpaceOnUse"><stop stop-color="#091824"/><stop offset="1" stop-color="#122936"/></linearGradient>
+    <linearGradient id="line" x1="360" y1="0" x2="930" y2="0" gradientUnits="userSpaceOnUse"><stop stop-color="#6AD7C4"/><stop offset="1" stop-color="#9EBDF9"/></linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" stroke="#99BDCC" stroke-opacity=".05"/></pattern>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="m1 1 5 3-5 3" fill="none" stroke="#8AA9B7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs>
+  <rect width="1280" height="640" rx="24" fill="url(#bg)"/>
+  <rect width="1280" height="640" rx="24" fill="url(#grid)"/>
+  <circle cx="1182" cy="72" r="160" fill="#75D4C4" opacity=".025"/>
+  <g font-family="Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif">
+    <g transform="translate(64 48)"><path d="m0 15 14-14 14 14-14 14Z" stroke="#79E0CD" stroke-width="2"/><path d="m9 15 5-5 5 5-5 5Z" fill="#79E0CD"/><text x="42" y="22" fill="#D8E5EB" font-size="22" font-weight="600" letter-spacing=".2">agentskills-bridge</text></g>
+    <text x="1216" y="70" text-anchor="end" fill="#7F9CA9" font-size="13" font-weight="600" letter-spacing="2">SKILL  /  AGENT  /  WORKFLOW</text>
+    <text x="64" y="162" fill="#F3F7F9" font-size="49" font-weight="650" letter-spacing="-1.5">Convert across frameworks.</text>
+    <text x="64" y="222" fill="#89E3D1" font-size="49" font-weight="650" letter-spacing="-1.5">Bring every source byte home.</text>
+    <text x="66" y="266" fill="#9BB3BF" font-size="20">Native artifacts for execution. A preservation capsule for the return.</text>
+
+    <rect x="64" y="322" width="288" height="218" rx="18" fill="#122936" stroke="#355160"/>
+    <path d="M89 350h18l9 9v27H89Z" stroke="#8CE0D0" stroke-width="1.7" stroke-linejoin="round"/><path d="M107 350v9h9M95 369h15M95 375h11" stroke="#8CE0D0" stroke-width="1.7"/>
+    <text x="132" y="375" fill="#EDF5F8" font-size="23" font-weight="600">Your skill bundle</text>
+    <path d="M88 403h240" stroke="#2A4655"/>
+    <g fill="#AAC0CB" font-size="17" font-family="ui-monospace, SFMono-Regular, Consolas, monospace"><text x="88" y="438">SKILL.md</text><text x="88" y="470">references/  scripts/</text><text x="88" y="502">assets/  + metadata</text></g>
+
+    <path d="M372 415h80" stroke="url(#line)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="411" y="397" text-anchor="middle" fill="#819EAC" font-size="13" letter-spacing="1.4">LOAD</text>
+    <rect x="474" y="344" width="300" height="174" rx="22" fill="#1A3946" stroke="#78CCBD" stroke-opacity=".6"/>
+    <path d="m608 372 16-9 16 9v19l-16 9-16-9Z" stroke="#95E8D7" stroke-width="1.7"/><path d="m608 372 16 9 16-9m-16 9v19" stroke="#95E8D7" stroke-width="1.7"/>
+    <text x="624" y="436" text-anchor="middle" fill="#E8FFF9" font-size="32" font-weight="650" letter-spacing="-.6">AgentIR</text>
+    <text x="624" y="473" text-anchor="middle" fill="#9FCFC4" font-size="16">One shared representation</text>
+    <path d="M796 415h80" stroke="url(#line)" stroke-width="2" marker-end="url(#arrow)"/>
+    <text x="836" y="397" text-anchor="middle" fill="#819EAC" font-size="13" letter-spacing="1.4">EMIT</text>
+
+    <rect x="900" y="322" width="316" height="218" rx="18" fill="#142A3B" stroke="#3F556D"/>
+    <text x="924" y="363" fill="#EAF2FD" font-size="23" font-weight="600">Framework project</text>
+    <rect x="924" y="386" width="268" height="54" rx="10" fill="#203E55"/>
+    <path d="m940 405 6 8-6 8m12 0h10" stroke="#B6D1FC" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="976" y="420" fill="#C0D7F9" font-size="17">Native artifacts</text>
+    <rect x="924" y="452" width="268" height="64" rx="10" fill="#203D3E" stroke="#4B8F80" stroke-dasharray="3 4"/>
+    <path d="M941 471h18v19h-18Z" stroke="#9ADCCB" stroke-width="1.6"/><path d="m945 481 4 4 6-8" stroke="#9ADCCB" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    <text x="976" y="480" fill="#B8EDDE" font-size="16" font-weight="600">Preservation capsule</text>
+    <text x="976" y="500" fill="#80B5A8" font-size="12">Complete source + integrity manifest</text>
+
+    <path d="M1056 552v24H210v-24" stroke="#4D7F80" stroke-width="1.5" stroke-dasharray="4 5" marker-end="url(#arrow)"/>
+    <rect x="432" y="563" width="414" height="26" rx="13" fill="#102632"/>
+    <text x="639" y="581" text-anchor="middle" fill="#9AB9BC" font-size="14" letter-spacing=".4">VERIFY  ·  RESTORE  ·  REPEAT</text>
+    <circle cx="1201" cy="601" r="3" fill="#87DCC8"/><text x="1187" y="606" text-anchor="end" fill="#597A89" font-size="12" letter-spacing="1">DESIGNED FOR THE WAY BACK</text>
+  </g>
+</svg>

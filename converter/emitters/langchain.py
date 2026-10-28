@@ -53,16 +53,17 @@ def _agent_py(ir: AgentIR) -> str:
 
 
 def _header(ir: AgentIR) -> str:
-    title = ir.title()
-    return (
-        "#!/usr/bin/env python3\n"
-        f'"""{title} —— LangChain agent。\n\n'
+    intro = (
+        f"{ir.title()} —— LangChain agent。\n\n"
         "本文件由 agentskills-bridge 转换引擎自 AgentIR 生成,可独立阅读与修改:\n"
         "- SYSTEM_PROMPT:源 agent 的完整系统提示词;\n"
         "- KNOWLEDGE:随附知识文档清单(文件在同目录 knowledge/ 下);\n"
         "- 工具:均为 stub 实现,接入真实后端前请补全函数体;\n"
         '- 主流程:langchain>=1.0 的 create_agent(注释中给出 langgraph 与旧版替代写法)。\n'
-        '"""\n\n'
+    )
+    return (
+        "#!/usr/bin/env python3\n"
+        f"{intro!r}\n\n"
         "from langchain.agents import create_agent\n"
         "from langchain.chat_models import init_chat_model\n"
         "from langchain_core.tools import tool\n"
@@ -73,12 +74,10 @@ def _header(ir: AgentIR) -> str:
 def _prompt_section(ir: AgentIR) -> str:
     # AGENT_NAME/SKILL_DESCRIPTION 是自描述元数据:parse_langchain 优先
     # 提取它们,保证 roundtrip 不把 name 退化成文件名词干。
-    desc = " ".join((ir.description or "").split()) or ir.title()
-    desc = desc.replace("\\", "/").replace(chr(34), chr(39))
     return (
         "# ---------- 元数据与系统提示词(源自 AgentIR) ----------\n\n"
-        f'AGENT_NAME = "{ir.name}"\n'
-        f'SKILL_DESCRIPTION = "{desc.replace(chr(34), chr(39))}"\n\n'
+        f'AGENT_NAME = {ir.name!r}\n'
+        f'SKILL_DESCRIPTION = {ir.description!r}\n\n'
         f"SYSTEM_PROMPT = {_py_triple(ir.system_prompt)}\n"
     )
 
@@ -108,9 +107,10 @@ def _tools_section(ir: AgentIR) -> str:
         )
         tools_list = "TOOLS = [echo_tool]"
     else:
-        sources = [_tool_stub(t) for t in ir.tools]
+        idents = _unique_identifiers([t.name for t in ir.tools], "tool")
+        sources = [_tool_stub(t, ident) for t, ident in zip(ir.tools, idents)]
         stubs = "\n\n".join(sources)
-        tools_list = "TOOLS = [" + ", ".join(_identifier(t.name, "tool") for t in ir.tools) + "]"
+        tools_list = "TOOLS = [" + ", ".join(idents) + "]"
     return (
         "# ---------- 工具定义(均为 stub,请接入真实实现) ----------\n\n"
         f"{stubs}\n\n{tools_list}\n"
@@ -176,8 +176,8 @@ def _main_section() -> str:
 
 # ---------- 工具 stub 生成 ----------
 
-def _tool_stub(tool: ToolSpec) -> str:
-    ident = _identifier(tool.name, "tool")
+def _tool_stub(tool: ToolSpec, identifier: Optional[str] = None) -> str:
+    ident = identifier or _identifier(tool.name, "tool")
     params, _ = _params_from_schema(tool.input_schema)
     doc = _tool_docstring(
         (tool.description or f"工具 {tool.name or ident} 的 stub。").strip(),
@@ -185,7 +185,7 @@ def _tool_stub(tool: ToolSpec) -> str:
         tool.side_effects,
     )
     return (
-        "@tool\n"
+        f"@tool({tool.name!r})\n"
         f"def {ident}({params}) -> str:\n"
         f"    {_py_triple(doc)}\n"
         "    # TODO(stub): 按 input_schema 接入真实实现,替换下面的占位返回。\n"
@@ -216,11 +216,13 @@ def _params_from_schema(schema: dict) -> Tuple[str, bool]:
     props = (schema or {}).get("properties") or {}
     parts: List[str] = []
     needs_any = False
-    for pname, pschema in props.items():
-        ptype = _PY_TYPES.get(str((pschema or {}).get("type", "")).lower(), "Any")
+    idents = _unique_identifiers(list(props), "arg")
+    for ident, pschema in zip(idents, props.values()):
+        prop = pschema if isinstance(pschema, dict) else {}
+        ptype = _PY_TYPES.get(str(prop.get("type", "")).lower(), "Any")
         if ptype == "Any":
             needs_any = True
-        parts.append(f"{_identifier(str(pname), 'arg')}: {ptype}")
+        parts.append(f"{ident}: {ptype}")
     return ", ".join(parts), needs_any
 
 
@@ -228,7 +230,8 @@ def _needs_any(ir: AgentIR) -> bool:
     for t in ir.tools:
         props = (t.input_schema or {}).get("properties") or {}
         for pschema in props.values():
-            if str((pschema or {}).get("type", "")).lower() not in _PY_TYPES:
+            prop = pschema if isinstance(pschema, dict) else {}
+            if str(prop.get("type", "")).lower() not in _PY_TYPES:
                 return True
     return False
 
@@ -246,19 +249,28 @@ def _identifier(name: str, fallback: str = "arg") -> str:
     return ident
 
 
+def _unique_identifiers(names: list, fallback: str) -> List[str]:
+    """Keep distinct external names distinct after Python identifier normalization."""
+    used = set()
+    result = []
+    for name in names:
+        base = _identifier(str(name), fallback)
+        ident, suffix = base, 2
+        while ident in used:
+            ident = f"{base}_{suffix}"
+            suffix += 1
+        used.add(ident)
+        result.append(ident)
+    return result
+
+
 def _py_triple(text: str) -> str:
-    """把文本嵌成 Python 三引号字面量;含 \"\"\" 时改用 ''' 并处理冲突。"""
-    if not text:
-        return '""'
-    delim = '"""'
-    if delim in text:
-        delim = "'''"
-    body = text.replace("\\", "\\\\")
-    if delim in body:
-        body = body.replace(delim, "\\" + delim)
-    if body.endswith(delim[0]):
-        body = body[:-1] + "\\" + delim[0]
-    return delim + body + delim
+    """生成安全 Python 字符串字面量,保留 NUL、转义和任意引号组合。"""
+    body = (text or "").replace("\\", "\\\\").replace('"""', '"\\x22"')
+    body = "".join(f"\\x{ord(ch):02x}" if ord(ch) < 32 and ch not in "\n\t" else ch for ch in body)
+    if body.endswith('"'):
+        body = body[:-1] + '\\x22'
+    return '"""' + body + '"""'
 
 
 # ---------- 知识文档拷贝 ----------

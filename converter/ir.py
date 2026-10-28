@@ -112,6 +112,9 @@ class AgentIR:
     tasks: List[TaskStep] = field(default_factory=list)
     scripts: List[str] = field(default_factory=list)  # skill 侧 scripts/ 相对路径
     metadata: Dict[str, Any] = field(default_factory=dict)  # source_format / source_path / model 等
+    # Portable source tree. Each entry stores base64 bytes, SHA-256 and POSIX mode.
+    # Empty for external agent inputs; omitted from legacy JSON when empty.
+    source_files: Dict[str, Dict[str, Any]] = field(default_factory=dict)
 
     # ---------- 序列化 ----------
 
@@ -127,6 +130,7 @@ class AgentIR:
             "tasks": [t.to_dict() for t in self.tasks],
             "scripts": list(self.scripts),
             "metadata": dict(self.metadata),
+            **({"source_files": self.source_files} if self.source_files else {}),
         }
 
     @classmethod
@@ -142,6 +146,7 @@ class AgentIR:
             tasks=[TaskStep.from_dict(t) for t in data.get("tasks", [])],
             scripts=list(data.get("scripts", [])),
             metadata=dict(data.get("metadata", {})),
+            source_files=dict(data.get("source_files", {})),
         )
 
     def to_json(self, indent: int = 2) -> str:
@@ -180,28 +185,55 @@ def slugify(text: str, fallback: str = "agent") -> str:
 
 
 def parse_frontmatter(text: str) -> "tuple[Dict[str, str], str]":
-    """解析 YAML frontmatter(只取平面的字符串字段),返回 (meta, body)。"""
-    if not text.startswith("---"):
+    """Read top-level YAML strings, including quotes and block scalars.
+
+    This dependency-free subset is not a general YAML interpreter. Unknown
+    nested fields are archived byte-for-byte by the preservation layer.
+    """
+    match = re.match(r"\A---[ \t]*\r?\n(.*?)\r?\n---[ \t]*(?:\r?\n|\Z)", text, re.S)
+    if not match:
         return {}, text
-    end = text.find("\n---", 3)
-    if end == -1:
-        return {}, text
-    raw = text[3:end].strip("\n")
-    body = text[end + 4:].lstrip("\n")
+    lines = match.group(1).splitlines()
     meta: Dict[str, str] = {}
-    key: Optional[str] = None
-    buf: List[str] = []
-    for line in raw.splitlines():
-        if not line.strip() or line.lstrip().startswith("#"):
+    i = 0
+    while i < len(lines):
+        m = re.match(r"^([A-Za-z0-9_-]+):[ \t]*(.*)$", lines[i])
+        i += 1
+        if not m:
             continue
-        m = re.match(r"^([A-Za-z0-9_-]+):\s*(.*)$", line)
-        if m and not line.startswith((" ", "\t")):
-            if key:
-                meta[key] = " ".join(buf).strip()
-            key, value = m.group(1), m.group(2).strip().strip('"').strip("'")
-            buf = [value] if value else []
-        elif key:
-            buf.append(line.strip())
-    if key:
-        meta[key] = " ".join(buf).strip()
-    return meta, body
+        key, value = m.groups()
+        continuation = []
+        while i < len(lines) and (not lines[i].strip() or lines[i].startswith((" ", "\t"))):
+            continuation.append(lines[i])
+            i += 1
+        scalar = value.split(" #", 1)[0].strip()
+        if scalar in ("|", "|-", "|+", ">", ">-", ">+"):
+            nonempty = [len(x) - len(x.lstrip(" ")) for x in continuation if x.strip()]
+            indent = min(nonempty, default=0)
+            block = [x[indent:] if x.strip() else "" for x in continuation]
+            if scalar.startswith("|"):
+                value = "\n".join(block)
+            else:
+                value = ""
+                for index, line in enumerate(block):
+                    value += line
+                    if index + 1 < len(block):
+                        value += " " if line and block[index + 1] else "\n"
+            if scalar.endswith("-"):
+                value = value.rstrip("\n")
+            elif not scalar.endswith("+"):
+                value = value.rstrip("\n") + "\n"
+            else:
+                value += "\n"
+        elif value.startswith(chr(34)):
+            try:
+                value, _ = json.JSONDecoder().raw_decode(value)
+            except ValueError:
+                value = value.strip(chr(34))
+        elif value.startswith("'"):
+            quoted = re.match(r"^'((?:[^']|'')*)'", value)
+            value = quoted.group(1).replace("''", "'") if quoted else value.strip("'")
+        else:
+            value = " ".join([scalar] + [x.strip() for x in continuation if x.strip()]).strip()
+        meta[key] = value
+    return meta, text[match.end():].lstrip("\r\n")

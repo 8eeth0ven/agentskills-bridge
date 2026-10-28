@@ -45,7 +45,7 @@ interface:
 3. 输出使用 Markdown,含概述、要点、示例三节
 ```
 
-真实样例(本机参考,完整字段同上):`/tmp/CrewAI-AgentCodingSkills/crewskills/skills/agent-fullcycle-engineering/agents/openai.yaml`:
+仓库样例(完整字段同上):`examples/agent-fullcycle-engineering/agents/openai.yaml`:
 
 ```yaml
 interface:

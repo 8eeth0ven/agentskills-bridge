@@ -54,7 +54,10 @@ def extract_interface_fields(text: str) -> Dict[str, str]:
             continue
         key, value = m.group(1), m.group(2)
         if key in ("display_name", "short_description", "default_prompt") and value:
-            fields[key] = _strip_quotes(value)
+            try:
+                fields[key] = json.loads(value) if value.startswith('"') else _strip_quotes(value)
+            except ValueError:
+                fields[key] = _strip_quotes(value)
     return fields
 
 
@@ -68,18 +71,22 @@ def _first_sentence(text: str, max_chars: int = 120) -> str:
     return snippet[:max_chars].rstrip()
 
 
-def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
+def load_skill(skill_dir: Union[str, Path], *, native_only: bool = False) -> AgentIR:
     """把 skill 目录读成 AgentIR。
 
     SKILL.md 缺失抛 FileNotFoundError("missing SKILL.md: ...");
     agents/ 与 references/ 与 scripts/ 缺失一律容忍(空集合)。
     """
     skill_path = Path(skill_dir)
+    from converter.preservation import capture_files, read_capsule, CAPSULE_DIR
+    if not native_only and ((skill_path / CAPSULE_DIR).exists() or (skill_path / CAPSULE_DIR).is_symlink()):
+        return read_capsule(skill_path, "skill")[0]
     skill_md = skill_path / "SKILL.md"
     if not skill_md.is_file():
         raise FileNotFoundError(f"missing SKILL.md: {skill_md}")
 
-    text = skill_md.read_text(encoding="utf-8")
+    source_files = capture_files(skill_path)
+    text = skill_md.read_bytes().decode("utf-8")
     meta, body = parse_frontmatter(text)
     name = (meta.get("name") or "").strip() or slugify(skill_path.name)
     description = meta.get("description", "")
@@ -105,15 +112,15 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
     knowledge = []
     refs_dir = skill_path / "references"
     if refs_dir.is_dir():
-        for md in sorted(refs_dir.glob("*.md")):
+        for md in sorted(refs_dir.rglob("*.md")):
             if not md.is_file():
                 continue
-            content = md.read_text(encoding="utf-8")
+            content = md.read_bytes().decode("utf-8")
             m = re.search(r"^# (.+?)\s*$", content, re.MULTILINE)
             title = m.group(1).strip() if m else md.stem
             knowledge.append(
                 KnowledgeDoc(
-                    filename=md.name,
+                    filename=md.relative_to(refs_dir).as_posix(),
                     title=title,
                     content=content,
                     source_path=str(md.resolve()),
@@ -156,6 +163,15 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
                     metadata.setdefault(key, value)
         except json.JSONDecodeError:
             pass
+    # Explicit override for edited contracts when original metadata is opaque YAML.
+    override = meta.get("x-bridge-tools")
+    if override is not None:
+        try:
+            raw_tools = json.loads(override)
+            if isinstance(raw_tools, list):
+                tools = [ToolSpec.from_dict(t) for t in raw_tools if isinstance(t, dict)]
+        except json.JSONDecodeError:
+            pass
     return AgentIR(
         name=name,
         display_name=display_name,
@@ -166,4 +182,5 @@ def load_skill(skill_dir: Union[str, Path]) -> AgentIR:
         knowledge=knowledge,
         scripts=scripts,
         metadata=metadata,
+        source_files=source_files,
     )

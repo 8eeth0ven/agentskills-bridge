@@ -210,12 +210,9 @@ def parse_crewai(config_dir: Union[str, Path]) -> AgentIR:
     name = slugify(str(agent_key))
     title = " ".join(p.capitalize() for p in name.split("-") if p) or str(agent_key)
 
-    # system_prompt 组装:backstory 本身是 markdown 正文(以 # 开头,即
-    # agentskills-bridge emitter 的产物形态)时直接作为正文 —— 三段包装头
-    # 会与正文自身的标题层重复,roundtrip 字符保真被破坏(评测 crewai 链
-    # F_prompt 的主要残余损失)。原生 crewai 项目(backstory 为人格化
-    # 纯文本)仍走 `# {title}` + Role/Goal/Backstory 三段组装。
-    if backstory.lstrip().startswith("#"):
+    # 明确的 emitter 标识才允许把 backstory 作为完整系统指令。
+    # 原生工程可能同样使用 Markdown,不能仅凭 # 猜测来源并抹去 role/goal。
+    if agent.get("x-agentskills-bridge") in (True, "true"):
         system_prompt = backstory.strip()
     else:
         parts: List[str] = [f"# {role or title}"]

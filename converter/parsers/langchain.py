@@ -1,7 +1,7 @@
-"""LangChain .py 文件 → AgentIR 解析器(best-effort 正则提取)。
+"""LangChain .py 文件 → AgentIR 解析器(AST literal 优先,正则容错)。
 
 提取目标:
-    SYSTEM_PROMPT / system_prompt / SYSTEM_MESSAGE 三引号常量 → system_prompt
+    SYSTEM_PROMPT / system_prompt / SYSTEM_MESSAGE 字符串常量 → system_prompt
     @tool 装饰函数名 / StructuredTool(name=...) → ToolSpec(docstring 首段)
         docstring 内的 `schema: {单行 JSON}` / `side-effects: true|false`
         元数据行 → ToolSpec.input_schema / side_effects(emitter 侧
@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import ast
 import json
 import re
 from pathlib import Path
@@ -69,7 +70,24 @@ def _literal_eval(value: str, delim: str) -> str:
 
 
 def _extract_system_prompt(text: str) -> str:
-    """先找 prompt 常量赋值,失败回退全文第一个 >50 字符三引号字符串。"""
+    """无执行地解码 Python literal,失败回退已有三引号容错提取。"""
+    constants = _module_constants(text)
+    for key in ("SYSTEM_PROMPT", "system_prompt", "SYSTEM_MESSAGE"):
+        if isinstance(constants.get(key), str):
+            return constants[key]
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        tree = None
+    if tree is not None:
+        # A comment or dynamic f-string is not a decoded prompt. For valid
+        # modules, the only fallback is an actual module docstring.
+        for node in tree.body:
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target] if isinstance(node, ast.AnnAssign) else []
+            if any(isinstance(target, ast.Name) and target.id in ("SYSTEM_PROMPT", "system_prompt", "SYSTEM_MESSAGE") for target in targets):
+                return ""
+        doc = ast.get_docstring(tree, clean=False) or ""
+        return doc.strip() if len(doc.strip()) > 50 else ""
     for m in _PROMPT_CONST_RE.finditer(text):
         if m.group(2) is not None:
             value = _literal_eval(m.group(2), '"""')
@@ -85,6 +103,30 @@ def _extract_system_prompt(text: str) -> str:
         if value and len(value.strip()) > 50:
             return value.strip()
     return ""
+
+
+def _module_constants(text: str) -> Dict[str, Any]:
+    """只读取模块顶层 literal 常量,不执行源文件或导入其中依赖。"""
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        return {}
+    constants: Dict[str, Any] = {}
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            names, value = node.targets, node.value
+        elif isinstance(node, ast.AnnAssign):
+            names, value = [node.target], node.value
+        else:
+            continue
+        try:
+            literal = ast.literal_eval(value)
+        except (TypeError, ValueError, SyntaxError):
+            continue
+        for name in names:
+            if isinstance(name, ast.Name):
+                constants[name.id] = literal
+    return constants
 
 
 def _docstring_value(raw: str, delim: str) -> str:
@@ -119,7 +161,39 @@ def _extract_tools(text: str) -> List[ToolSpec]:
     tools: List[ToolSpec] = []
     seen = set()
 
-    for m in _TOOL_DEF_RE.finditer(text):
+    # Literal AST decoding avoids regex quote truncation and fixed docstring windows.
+    try:
+        tree = ast.parse(text)
+    except (SyntaxError, ValueError):
+        tree = None
+    if tree is not None:
+        for node in tree.body:
+            if not isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                continue
+            tool_name = None
+            for decorator in node.decorator_list:
+                call = decorator if isinstance(decorator, ast.Call) else None
+                target = call.func if call is not None else decorator
+                leaf = target.id if isinstance(target, ast.Name) else getattr(target, "attr", "")
+                if leaf != "tool":
+                    continue
+                tool_name = node.name
+                if call is not None and call.args:
+                    if isinstance(call.args[0], ast.Constant) and isinstance(call.args[0].value, str):
+                        tool_name = call.args[0].value
+                if call is not None:
+                    for kw in call.keywords:
+                        if kw.arg == "name" and isinstance(kw.value, ast.Constant) and isinstance(kw.value.value, str):
+                            tool_name = kw.value.value
+            if tool_name is None or tool_name in seen:
+                continue
+            doc_value = ast.get_docstring(node, clean=False) or ""
+            schema, side_effects = _tool_meta_from_docstring(doc_value)
+            seen.add(tool_name)
+            tools.append(ToolSpec(name=tool_name, description=_first_paragraph(doc_value),
+                                  input_schema=schema, side_effects=side_effects))
+
+    for m in (() if tree is not None else _TOOL_DEF_RE.finditer(text)):
         name = m.group(1)
         if name in seen:
             continue
@@ -175,11 +249,20 @@ def parse_langchain(py_file: Union[str, Path]) -> AgentIR:
     system_prompt = _extract_system_prompt(text)
     tools = _extract_tools(text)
 
-    m_name = _AGENT_NAME_CONST_RE.search(text)
-    m_desc = _SKILL_DESC_CONST_RE.search(text)
-    name = slugify(m_name.group(1)) if m_name else slugify(path.stem)
+    constants = _module_constants(text)
+    try:
+        ast.parse(text)
+        valid_python = True
+    except (SyntaxError, ValueError):
+        valid_python = False
+    m_name = None if valid_python else _AGENT_NAME_CONST_RE.search(text)
+    m_desc = None if valid_python else _SKILL_DESC_CONST_RE.search(text)
+    raw_name = constants.get("AGENT_NAME")
+    name = slugify(raw_name) if isinstance(raw_name, str) else slugify(m_name.group(1)) if m_name else slugify(path.stem)
     title = " ".join(p.capitalize() for p in name.split("-") if p) or path.stem
-    if m_desc:
+    if isinstance(constants.get("SKILL_DESCRIPTION"), str):
+        first_sentence = constants["SKILL_DESCRIPTION"]
+    elif m_desc:
         first_sentence = m_desc.group(1).strip()
     else:
         first_sentence = system_prompt.split(". ")[0].strip() if system_prompt else ""

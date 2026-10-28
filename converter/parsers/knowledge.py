@@ -22,17 +22,18 @@ def collect_knowledge(*base_dirs: Union[str, Path]) -> List[KnowledgeDoc]:
         kdir = Path(base) / "knowledge"
         if not kdir.is_dir():
             continue
-        for path in sorted(kdir.glob("*.md")):
-            if path.name in seen:
+        for path in sorted(kdir.rglob("*.md")):
+            rel = path.relative_to(kdir).as_posix()
+            if rel in seen:
                 continue
-            content = path.read_text(encoding="utf-8")
+            content = path.read_bytes().decode("utf-8")
             title = ""
             for line in content.splitlines():
                 if line.startswith("# "):
                     title = line[2:].strip()
                     break
-            seen[path.name] = KnowledgeDoc(
-                filename=path.name,
+            seen[rel] = KnowledgeDoc(
+                filename=rel,
                 title=title or path.stem,
                 content=content,
                 source_path=str(path.resolve()),

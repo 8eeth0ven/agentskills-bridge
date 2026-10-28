@@ -14,3 +14,11 @@ glm_keys.env
 .DS_Store
 .idea/
 .vscode/
+
+# Playwright/browser MCP artifacts
+.playwright-mcp/
+
+# Generated conversions, previews and optional evaluation runs
+out/
+evaluation/behavior/latest/
+evaluation/external/latest/

@@ -113,7 +113,7 @@ def _frontmatter_metadata(ir) -> dict:
     return out
 
 
-def write_skill(
+def _write_skill_native(
     ir: AgentIR,
     out_dir: Union[str, Path],
     copy_scripts_from: Union[str, Path, None] = None,
@@ -141,7 +141,7 @@ def write_skill(
     if metadata:
         compact = json.dumps(metadata, ensure_ascii=False, separators=(",", ":"))
         meta_line = "\nmetadata: " + compact
-    skill_md = f"---\nname: {name}\ndescription: {desc}{meta_line}\n---\n\n{ir.system_prompt or ''}"
+    skill_md = f"---\nname: {name}\ndescription: {_yaml_str(desc)}{meta_line}\n---\n\n{ir.system_prompt or ''}"
     if not skill_md.endswith("\n"):
         skill_md += "\n"
     (out / "SKILL.md").write_text(skill_md, encoding="utf-8")
@@ -160,11 +160,14 @@ def write_skill(
 
     # references/:每个 KnowledgeDoc 一个文件
     for doc in ir.knowledge:
-        filename = Path(doc.filename).name or "reference.md"
+        from converter.preservation import safe_path
+        filename = safe_path(doc.filename or "reference.md")
         content = doc.content or ""
         if content and not content.endswith("\n"):
             content += "\n"
-        (out / "references" / filename).write_text(content, encoding="utf-8")
+        dst = out / "references" / filename
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_text(content, encoding="utf-8")
 
     # 可选拷贝 scripts
     if copy_scripts_from is not None:
@@ -181,3 +184,20 @@ def write_skill(
             shutil.copy2(src, dst)
 
     return out
+
+
+def write_skill(ir: AgentIR, out_dir: Union[str, Path],
+                copy_scripts_from: Union[str, Path, None] = None) -> Path:
+    """Write a verified portable skill package, restoring original files if held.
+
+    Output must be new/empty. For native external inputs without source_files,
+    generate a normalized SKILL.md and preserve the full IR in its capsule.
+    """
+    from converter.preservation import package_output, project_source_skill
+
+    def emit(value, out):
+        if value.source_files:
+            project_source_skill(value, out)
+        else:
+            _write_skill_native(value, out, copy_scripts_from)
+    return package_output(ir, out_dir, "skill", emit)

@@ -9,7 +9,7 @@
        skills=["<out>/skills"] 目录发现式引用,真实跑一轮(证明 skills 目录
        运行时真实加载)。
 
-实测环境(2026-10-11,/tmp/venv-crewai,crewai==1.15.27):
+实测环境(2026-10-11,crewai==1.15.27):
 - crewai 1.15.x 不再捆绑 litellm:LLM() 路由到内置原生 provider。
   OpenAI 协议:`openai/` 前缀 + api_base 自动判 custom_openai,命中
   OpenAICompletion(base_url=api_base);
@@ -20,8 +20,8 @@
   "## Response Modes"(Beginner/Interview/Project delivery/Debugging)。
   backstory/SKILL.md 正文真实生效时,回答必含其中任一模式词。
 
-运行方式(需先 source /tmp/glm_keys.env 或自行 export GLM_API_KEY 等):
-    /tmp/venv-crewai/bin/python -m unittest evaluation.runtime.test_glm_e2e_crewai -v
+运行方式(需先通过环境变量设置 GLM_API_KEY 等):
+    python3 -m unittest evaluation.runtime.test_glm_e2e_crewai -v
 
 无 GLM_API_KEY 时整类 skipTest(密钥缺失不算失败)。
 """
@@ -29,7 +29,6 @@
 from __future__ import annotations
 
 import os
-import shutil
 import sys
 import time
 import unittest
@@ -39,31 +38,17 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from evaluation.runtime._artifacts import artifact_root
+
 SKILL_DIR = PROJECT_ROOT / "examples" / "agent-fullcycle-engineering"
-OUT_CREWAI = Path("/tmp/e2e/crewai")
-OUT_CREWAI_SKILLS = Path("/tmp/e2e/crewai-skills")
+OUT_CREWAI: Path
+OUT_CREWAI_SKILLS: Path
 SKILL_NAME = "agent-fullcycle-engineering"
 
 QUESTION = "这个 skill 有哪几种 Response Modes?只列名字"
 MODE_WORDS = ("Beginner", "Interview", "Project delivery", "Debugging")
 TIMEOUT_S = 120  # 单次调用预算(LLM timeout 110s + 余量),失败重试一次
-GLM_KEYS_FILE = Path("/tmp/glm_keys.env")
 
-
-def _load_glm_env() -> None:
-    """测试自包含:GLM_* 未注入时从 /tmp/glm_keys.env 读(只进进程 env,不落仓库)。"""
-    if os.environ.get("GLM_API_KEY"):
-        return
-    if not GLM_KEYS_FILE.is_file():
-        return
-    for line in GLM_KEYS_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key, value = key.strip(), value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = value
 
 
 class GLME2ECrewaiTest(unittest.TestCase):
@@ -71,9 +56,8 @@ class GLME2ECrewaiTest(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        _load_glm_env()
         if not os.environ.get("GLM_API_KEY"):
-            raise unittest.SkipTest("GLM_API_KEY 未设置(且 /tmp/glm_keys.env 不可用),整类跳过")
+            raise unittest.SkipTest("GLM_API_KEY 未设置,整类跳过")
         try:
             import crewai  # noqa: F401
             import yaml  # noqa: F401
@@ -90,8 +74,10 @@ class GLME2ECrewaiTest(unittest.TestCase):
         from converter.skill_loader import load_skill
 
         ir = load_skill(SKILL_DIR)
-        for out in (OUT_CREWAI, OUT_CREWAI_SKILLS):
-            shutil.rmtree(out, ignore_errors=True)
+        global OUT_CREWAI, OUT_CREWAI_SKILLS
+        artifacts = artifact_root(cls)
+        OUT_CREWAI = artifacts / "crewai"
+        OUT_CREWAI_SKILLS = artifacts / "crewai-skills"
         EMITTERS["crewai"](ir, OUT_CREWAI)
         EMITTERS["crewai-skills"](ir, OUT_CREWAI_SKILLS)
 

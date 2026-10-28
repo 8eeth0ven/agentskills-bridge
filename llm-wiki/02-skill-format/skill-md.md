@@ -1,6 +1,6 @@
 # SKILL.md 规范
 
-SKILL.md 是 skill 目录的入口文件:frontmatter 提供元数据,正文是宿主 agent 常驻加载的主指令。本文以真实样例 `/tmp/CrewAI-AgentCodingSkills/crewskills/skills/agent-fullcycle-engineering/SKILL.md` 为参照。字段约束以 **Agent Skills 开放规范**(agentskills.io/specification;Anthropic 2025-10 随 Claude 推出、2025-12-18 移交开放标准;2026-10-11 调研核实)为权威——claude.ai 上传与 Anthropic Skills API 只接受规范 6 字段,多一个键即硬报错。
+SKILL.md 是 skill 目录的入口文件:frontmatter 提供元数据,正文是宿主 agent 常驻加载的主指令。本文以真实样例 `examples/agent-fullcycle-engineering/SKILL.md` 为参照。字段约束以 **Agent Skills 开放规范**(agentskills.io/specification;Anthropic 2025-10 随 Claude 推出、2025-12-18 移交开放标准;2026-10-11 调研核实)为权威——claude.ai 上传与 Anthropic Skills API 只接受规范 6 字段,多一个键即硬报错。
 
 ## 整体结构
 

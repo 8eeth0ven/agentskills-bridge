@@ -4,7 +4,7 @@
 构造对象,并用 crewai 包内的 skills 加载入口加载 crewai-skills 靶的技能目录。
 
 运行方式(项目根目录):
-    /tmp/venv-crewai/bin/python -m unittest evaluation.runtime.test_crewai_runtime -v
+    python3 -m unittest evaluation.runtime.test_crewai_runtime -v
 
 覆盖(对应任务 a-e,附 f 忠实度回归):
     a. test_a_yaml_semantic_equivalence —— pyyaml 读 config/agents.yaml,断言
@@ -33,7 +33,6 @@ crewai 不可 import 时整类 skipTest(网络/环境问题不判失败)。
 
 from __future__ import annotations
 
-import shutil
 import sys
 import unittest
 from pathlib import Path
@@ -42,9 +41,11 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from evaluation.runtime._artifacts import artifact_root
+
 SKILL_DIR = PROJECT_ROOT / "examples" / "agent-fullcycle-engineering"
-OUT_CREWAI = Path("/tmp/rt/crewai")
-OUT_CREWAI_SKILLS = Path("/tmp/rt/crewai-skills")
+OUT_CREWAI: Path
+OUT_CREWAI_SKILLS: Path
 SKILL_NAME = "agent-fullcycle-engineering"
 DESC_HEAD = "End-to-end AI agent engineering workflow"
 
@@ -79,8 +80,10 @@ class CrewAIRuntimeTest(unittest.TestCase):
         from converter.skill_loader import load_skill
 
         ir = load_skill(SKILL_DIR)
-        for out in (OUT_CREWAI, OUT_CREWAI_SKILLS):
-            shutil.rmtree(out, ignore_errors=True)
+        global OUT_CREWAI, OUT_CREWAI_SKILLS
+        artifacts = artifact_root(cls)
+        OUT_CREWAI = artifacts / "crewai"
+        OUT_CREWAI_SKILLS = artifacts / "crewai-skills"
         EMITTERS["crewai"](ir, OUT_CREWAI)
         EMITTERS["crewai-skills"](ir, OUT_CREWAI_SKILLS)
 

@@ -45,6 +45,11 @@ if emit_n8n is not None:
     EMITTERS["n8n"] = emit_n8n
 EMITTERS["mermaid-workflow"] = emit_mermaid_workflow
 
+# The registry is the public preservation API; module-level functions remain
+# available as low-level native projections for independent compatibility tests.
+from converter.preservation import preserving_emitter
+EMITTERS = {fmt: preserving_emitter(fmt, emit) for fmt, emit in EMITTERS.items()}
+
 __all__ = [
     "EMITTERS",
     "emit_autogen",

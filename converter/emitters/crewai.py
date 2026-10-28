@@ -50,6 +50,7 @@ def _folded_entry(key: str, value: str, indent: str = "  ") -> str:
 
 def _agents_yaml(ir: AgentIR) -> str:
     parts = [f"{ir.name}:\n"]
+    parts.append("  x-agentskills-bridge: true\n")
     parts.append(_folded_entry("role", ir.title()))
     parts.append(_folded_entry("goal", ir.description))
     # backstory 必须承载完整 system_prompt:它是 crewai 反向链唯一 prompt

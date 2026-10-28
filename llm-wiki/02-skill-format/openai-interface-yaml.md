@@ -1,6 +1,6 @@
 # agents/openai.yaml 规范
 
-`agents/openai.yaml` 是 skill 目录中的可选界面层文件,为 OpenAI 平台侧(Codex / ChatGPT UI)提供显示与默认输入配置。参考样例:`/tmp/CrewAI-AgentCodingSkills/crewskills/skills/agent-fullcycle-engineering/agents/openai.yaml`。
+`agents/openai.yaml` 是 skill 目录中的可选界面层文件,为 OpenAI 平台侧(Codex / ChatGPT UI)提供显示与默认输入配置。参考样例:`examples/agent-fullcycle-engineering/agents/openai.yaml`。
 
 ## 完整格式
 

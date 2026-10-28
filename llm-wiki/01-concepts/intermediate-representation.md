@@ -7,7 +7,7 @@ skill ──skill_loader──▶ AgentIR ──emitters──▶ crewai / langc
 crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer──▶ skill
 ```
 
-本文字段名与类型**与 `converter/ir.py` 严格一致**(该文件已定稿不得修改);修改任一侧必须同步另一侧。
+本文字段名与类型**与 `converter/ir.py` 严格一致**;修改任一侧必须同步另一侧。
 
 ## 顶层字段(AgentIR)
 
@@ -22,9 +22,10 @@ crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer�
 | `knowledge` | `List[KnowledgeDoc]` | `[]` | 知识文档列表,对应 skill 的 `references/<file>.md` |
 | `tasks` | `List[TaskStep]` | `[]` | 任务步骤;单 agent 通常只有一步,multi-agent 编排会有多步 |
 | `scripts` | `List[str]` | `[]` | skill 侧 `scripts/` 相对路径列表 |
+| `source_files` | `Dict[str, Dict[str, Any]]` | `{}` | 可运输的原始普通文件:相对路径 → `{data: base64, sha256: hex, mode: int}`;空时 JSON 省略此字段 |
 | `metadata` | `Dict[str, Any]` | `{}` | 杂项:至少含 `source_format`(取值见常量),常见还有 `source_path`、`short_description`、`model` |
 
-模块常量:`SOURCE_FORMATS = ("skill", "crewai", "langchain", "langflow", "generic")`,`TARGET_FORMATS = ("crewai", "langchain", "langflow", "openai", "generic")`。
+格式集合以 `converter/ir.py` 的常量和两侧注册表为准。当前有 11 个 target；CLI 另外支持 `convert --target skill`。
 
 ## ToolSpec(工具契约)
 
@@ -55,7 +56,7 @@ crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer�
 
 ## 序列化与辅助方法
 
-- `to_dict()` / `from_dict(data)`:dict 双向;`to_json(indent=2)` / `from_json(text)`(`ensure_ascii=False`,中文原样)。字段顺序固定:name → display_name → description → system_prompt → default_prompt → tools → knowledge → tasks → scripts → metadata。
+- `to_dict()` / `from_dict(data)`:dict 双向;`to_json(indent=2)` / `from_json(text)`(`ensure_ascii=False`,中文原样)。字段顺序固定:name → display_name → description → system_prompt → default_prompt → tools → knowledge → tasks → scripts → metadata → source_files(非空时)。
 - `title() -> str`:display_name 未显式提供时,把 kebab-case name 按 `-` 拆分、逐段首字母大写生成。
 - `backstory(max_chars=1200) -> str`:system_prompt 精简版,供 CrewAI backstory / UI 摘要;超长时在段落/句子边界(`"\n\n"` / `"\n"` / `". "`)截断并追加 `"\n..."`。
 - `slugify(text, fallback="agent") -> str`:任意文本规范成 kebab-case id(非 `[A-Za-z0-9]` 连续段折叠为 `-`,小写化;结果为空返回 fallback)。
@@ -92,7 +93,7 @@ crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer�
       "filename": "crewai-patterns.md",
       "title": "CrewAI Patterns",
       "content": "# CrewAI Patterns\n\nCrewAI crews, flows, YAML, memory, tracing, deployment, and CLI verification...",
-      "source_path": "/tmp/CrewAI-AgentCodingSkills/crewskills/skills/agent-fullcycle-engineering/references/crewai-patterns.md"
+      "source_path": "examples/agent-fullcycle-engineering/references/crewai-patterns.md"
     }
   ],
   "tasks": [
@@ -106,7 +107,7 @@ crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer�
   "scripts": ["scripts/scaffold_agent_project.py"],
   "metadata": {
     "source_format": "skill",
-    "source_path": "/tmp/CrewAI-AgentCodingSkills/crewskills/skills/agent-fullcycle-engineering",
+    "source_path": "examples/agent-fullcycle-engineering",
     "short_description": "Build agents with delegation and adaptive optimization"
   }
 }
@@ -119,3 +120,7 @@ crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer�
 - IR 是唯一枢纽:emitter/parser/skill_writer/skill_loader 都只认 AgentIR,不允许格式间点对点直转。
 - `name` 必须 kebab-case;外部名字不可靠时先过 `slugify()`。
 - `generic` emitter 直接输出 `agent.json`(`ir.to_json()`),本文的 JSON 形状即 generic 目标格式。
+
+## 完整资产保真
+
+公开 `EMITTERS` / `PARSERS` 注册表在原生投影外写入并验证 `.agentskills-bridge/` capsule，保存完整 IR 和源文件；模块函数仍作为低层原生接口。持久化 IR 移除本机 `source_path`，不依赖源目录回拷。未知 frontmatter、二进制和嵌套资源按字节保留；合法 IR 编辑须同步进入原生 skill 投影。详细协议、编辑语义和恢复范围见 [INTERFACE.md](../../INTERFACE.md)。

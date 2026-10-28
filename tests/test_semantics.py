@@ -130,7 +130,9 @@ class TestRealChainMermaid(unittest.TestCase):
             ir_mid = parse_mermaid_workflow(agent_dir)
             skill_out = work / "roundtrip.skill"
             write_skill(ir_mid, skill_out, copy_scripts_from=EXAMPLE_SKILL)
-            ir_out = load_skill(skill_out)
+            # This test deliberately measures the native projection, independent
+            # of the portable capsule's richer workflow TaskStep transport.
+            ir_out = load_skill(skill_out, native_only=True)
         result = semantic_metrics(ir_in=ir_in, ir_out=ir_out)
         self.assertEqual(result["S_struct"], 1.0,
                          f"结构应保真: {result}")

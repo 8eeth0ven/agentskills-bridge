@@ -40,6 +40,9 @@ if parse_n8n is not None:
     PARSERS["n8n"] = parse_n8n
 PARSERS["mermaid-workflow"] = parse_mermaid_workflow
 
+from converter.preservation import preserving_parser
+PARSERS = {fmt: preserving_parser(fmt, parse) for fmt, parse in PARSERS.items()}
+
 __all__ = [
     "PARSERS",
     "parse_autogen",

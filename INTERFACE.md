@@ -1,64 +1,82 @@
-# 转换引擎接口契约(subagent 必读)
+# 转换接口与保真契约
 
-项目:agentskills-bridge —— skill ↔ agent 双向转换器 + 只读 llm-wiki。
+Python ≥3.10，转换引擎无强制第三方依赖。公开转换路径为：
 
-## 数据流
-
-```
-skill(SkillDir) ──skill_loader──▶ AgentIR ──emitters──▶ crewai / langchain / langflow / openai / generic
-crewai / langchain / langflow ──parsers──▶ AgentIR ──skill_writer──▶ skill(SkillDir)
+```text
+skill / native definition → AgentIR → native projection + preservation capsule
 ```
 
-## AgentIR(converter/ir.py,已定稿,不得修改)
+## 公开 Python API
 
-字段:`name`(kebab-case)、`display_name`、`description`(何时用)、`system_prompt`(主指令)、`default_prompt`、`tools: list[ToolSpec]`、`knowledge: list[KnowledgeDoc]`(filename/title/content/source_path)、`tasks: list[TaskStep]`、`scripts: list[str]`、`metadata: dict`。
-
-辅助方法:`title()`、`backstory(max_chars)`(system_prompt 精简)、`slugify(text)`、`parse_frontmatter(text)->(meta, body)`。
-
-## 模块接口(必须严格一致)
-
-### converter/skill_loader.py
 ```python
-def load_skill(skill_dir: str | Path) -> AgentIR
-```
-读取 `<skill_dir>/SKILL.md`(frontmatter → name/description,正文 → system_prompt)、`agents/*.yaml`(interface.display_name/short_description/default_prompt,容忍缺失)、`references/*.md` → KnowledgeDoc(filename/title=首个 `#` 标题/content/source_path)、`scripts/*` → scripts 列表。metadata: `{"source_format": "skill", "source_path": <abs>, "short_description": ...}`。
+from converter.emitters import EMITTERS
+from converter.parsers import PARSERS
+from converter.skill_loader import load_skill
+from converter.skill_writer import write_skill
+from converter.preservation import read_capsule, PreservationError
 
-### converter/skill_writer.py
+ir = load_skill("examples/agent-fullcycle-engineering")
+EMITTERS["langchain"](ir, "out/langchain")
+restored = PARSERS["langchain"]("out/langchain/agent.py")
+write_skill(restored, "out/skill")
+verified_ir, manifest = read_capsule("out/skill")
+```
+
+`read_capsule` 接受 `Path` 或路径字符串。输出必须是新目录或空目录。转换先在相邻临时目录生成，成功后发布；失败不会覆盖已有非空目录。相同 IR 与相同文件权限在同一平台上生成确定性产物，capsule 不记录生成时间或本机源目录。
+
+`EMITTERS` / `PARSERS` 的键与 CLI 所列 11 个目标一致。模块级 `emit_<format>` / `parse_<format>` 函数保留为**低层原生接口**，用于独立格式验证；直接调用它们不提供完整 capsule 契约。
+
 ```python
-def write_skill(ir: AgentIR, out_dir: str | Path, copy_scripts_from: str | Path | None = None) -> Path
+# 原生产物已修改，明确从当前原生字段重新提取。
+ir = PARSERS["langchain"]("out/langchain/agent.py", native_only=True)
+# skill 同样支持显式原生读取。
+ir = load_skill("out/skill", native_only=True)
 ```
-产出完整 skill 目录:`SKILL.md`(frontmatter name/description + system_prompt 正文)、`agents/openai.yaml`(interface: display_name/short_description/default_prompt)、`references/*.md`(每个 KnowledgeDoc 一个文件)、可选拷贝 scripts。返回 out_dir。已存在则覆盖文件。
 
-### converter/emitters/*.py(每个模块一个函数)
-```python
-def emit_<fmt>(ir: AgentIR, out_dir: str | Path) -> Path   # fmt ∈ crewai/langchain/langflow/openai_agents/generic
+默认读取发现 capsule 时必须校验，不会在校验失败后偷偷降级为原生读取。显式原生导入放弃旧 capsule 独有的信息，新的转换包只承诺保存这次导入所得的 IR 和资产。
+
+## AgentIR
+
+`converter/ir.py` 是数据模型的权威实现。主要字段为 name、display_name、description、system_prompt、default_prompt、tools、knowledge、tasks、scripts、metadata，以及可选 `source_files`。
+
+| 子结构 | 关键字段 |
+| --- | --- |
+| `ToolSpec` | name、description、input_schema、side_effects |
+| `KnowledgeDoc` | filename（相对路径）、title、content、source_path |
+| `TaskStep` | name、description、expected_output、agent |
+| `source_files` | 相对路径 → `{data: base64, sha256: hex, mode: int}` |
+
+`source_files` 为空时，旧 JSON 形状保持不变；非空时可通过 `AgentIR.to_json()` 独立运输源文件。`load_skill()` 捕获所选目录内的全部普通文件，排除根 `.agentskills-bridge/` 协议目录；原生知识提取覆盖递归 UTF-8 Markdown，其他文件仍按字节归档。路径不得为绝对路径、包含 `..`、反斜杠、盘符或保留协议目录。符号链接与特殊文件明确拒绝。
+
+持久化的 IR 移除 `metadata.source_path` 和知识条目的本机 `source_path`；它们仅是本机定位信息。其余语义字段完整保留。工具契约与拓扑元数据被运输，不等于框架原生会执行它们。
+
+## Preservation Capsule v1
+
+```text
+<output>/
+  <native artifacts>
+  .agentskills-bridge/
+    ir.json
+    manifest.json
 ```
-- `crewai`: `config/agents.yaml`(name/role/goal/backstory/verbose:false)+ `config/tasks.yaml`(单任务 description/expected_output/agent)+ `knowledge/*.md`(knowledge 拷贝)+ `README.md`(如何 crewai run)。YAML 手写生成(不依赖 pyyaml),值需正确引号/缩进。
-- `langchain`: `agent.py`(可运行:SystemMessagePromptTemplate + tools stub + create_agent/或通用 create_react_agent 形式,内嵌 system_prompt 与知识清单注释)+ `requirements.txt` + `README.md`。纯文本生成,不需要真跑 langchain。
-- `langflow`: `flow.json` —— 合法 Langflow 包导出格式:`{"id":..., "data": {"nodes": [...], "edges": [...], "viewport": {...}}}`。节点含 ChatInput→Prompt(SystemPrompt 组件,template 里嵌 system_prompt)→OpenAIAgent/LLM→ChatOutput,edges 带源/目标 handle;每个节点需 id/type/position/data.template。知识文件作为同目录 `knowledge/` 拷贝 + README 说明导入方式。
-- `openai_agents`: `agents/openai.yaml`(interface: display_name/short_description/default_prompt)+ `instructions.md`(完整 system_prompt)+ `knowledge/*.md` + `README.md`(Codex/ChatGPT UI 用法)。与原仓库格式对齐。
-- `generic`: `agent.json`(ir.to_json())+ `knowledge/*.md` + `README.md`。
 
-### converter/parsers/*.py(每个模块一个函数,best-effort)
-```python
-def parse_crewai(config_dir: str | Path) -> AgentIR          # 读 config/agents.yaml + tasks.yaml
-def parse_langchain(py_file: str | Path) -> AgentIR          # 从 .py 提取 prompt/tools(正则/AST,best-effort)
-def parse_langflow(flow_file: str | Path) -> AgentIR         # 从 flow.json 提取 SystemPrompt 组件
-```
-YAML 解析:优先 `import yaml`(环境有),失败则用 ir.py 提供的工具/自行写最小平面解析。解析出的 AgentIR:`metadata={"source_format": "crewai"/...}`。role/goal/backstory 组装成 system_prompt 格式:`# {display_name}\n\n## Role\n...\n## Goal\n...\n## Backstory\n...`。
+manifest 包含 `schema_version: 1`、目标 `format`、`ir_sha256`，以及原生产物的完整文件集合（每项含 SHA-256 和 POSIX mode）。`ir.json` 中源文件的 base64 与其 SHA-256 也必须一致。
 
-### CLI 约定(cli.py,主线程负责)
-```
-python cli.py skill2agent <skill_dir> --target crewai|langchain|langflow|openai|generic --out <dir>
-python cli.py agent2skill <path> --from crewai|langchain|langflow|generic --out <dir>
-python cli.py wiki list|read <chapter>|verify
-python cli.py convert ir <in> ...   # 可选
-```
-target 名 `openai` → emitters.openai_agents;`--from` 名对应 parsers。
+读取时检查协议版本、目标格式、IR 哈希、原生产物的文件集合/字节/权限，以及源文件路径与哈希。新增文件也视为状态变化。manifest 提供完整性检查，不是签名或来源认证。capsule 与原生产物必须一起复制；仅复制一个 Python 或 JSON 文件会失去完整恢复契约。
 
-## 通用要求
+`read_capsule(root, expected_format=None)` 返回 `(AgentIR, manifest)`，格式/完整性错误抛 `PreservationError`。它不会执行被读取的 Python 或 shell 文件。
 
-- Python ≥3.10,零强制第三方依赖(pyyaml 可用时优先用,不可用时走内置路径)。
-- 所有文件 UTF-8,函数带 docstring,不 print 噪音(返回值说话)。
-- 不得修改 converter/ir.py、llm-wiki/、cli.py(主线程所有)。
-- 子模块内部可自由加 helper,但上述公开函数签名不可变。
+## 原始文件与合法编辑
+
+未编辑 IR 的源 skill 逐字节恢复，包括 CRLF、未知 frontmatter、附件、空文件及 POSIX 文件权限。空目录、时间戳、owner、ACL 不在恢复范围。
+
+原始 `source_files` 是来源快照。合法编辑活跃 IR 后，`skill`、`crewai-skills`、`deepagents` 的原生 skill 投影应用当前的 name/description/system_prompt、display/default、工具契约与知识文件。保留未编辑的扩展字段；删除的 Markdown 知识不在原生投影中复活。原始快照仍随 capsule 保存，表示来源，不替代活跃指令。工具契约通常写入 JSON `metadata.tools`；原始 metadata 为无法解释的 YAML 时用 `x-bridge-tools` 显式覆盖，避免删除未知 metadata。
+
+## 新增格式
+
+1. 实现原生 `emit_<fmt>(ir, out_dir) -> Path` 与 `parse_<fmt>(path) -> AgentIR`。
+2. 在两侧注册表和 `TARGET_FORMATS` 中注册，CLI 使用同一格式集合。
+3. 加原生产物字段测试，再跑全部格式对的 capsule/资源恢复测试。
+4. 在格式文档说明原生可表达字段、降级点与运行前需要的配置。
+
+新增格式的验证必须分别覆盖原生映射和 capsule，不能只测试保存的 IR 被原样读回。

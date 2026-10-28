@@ -1,4 +1,4 @@
-"""评测入口:3 corpus × 8 target 的 forward + roundtrip 全矩阵。
+"""评测入口:3 corpus × 11 target 的 forward + roundtrip 全矩阵。
 
     python3 evaluation/run_eval.py [--out evaluation/results]
 
@@ -268,7 +268,7 @@ def build_markdown(summary: Dict[str, Any], notes: Dict[str, str], run_date: str
     lines.append("# agentskills-bridge 评测基线")
     lines.append("")
     lines.append(f"- 运行日期:{run_date}")
-    lines.append("- 矩阵:3 corpus(S1_real / S2_cn / S3_min)× 8 target;")
+    lines.append(f"- 矩阵:3 corpus(S1_real / S2_cn / S3_min)× {len(TARGETS)} target;")
     lines.append("  forward = emit + V_format 静态校验;roundtrip = emit → parse → write_skill → load_skill 后的 F 指标。")
     lines.append("- F 列为 roundtrip 有效行均值(总样本数见 n;parser-missing/error 行不计入);V_format 为 forward 3 行均值。")
     if notes:

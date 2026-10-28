@@ -6,7 +6,7 @@
     e. test_e_autogen_glm_anthropic_protocol —— AnthropicChatCompletionClient
        (model=<glm>, base_url=GLM anthropic 兼容端点)同上。
 
-实测环境(2026-10-11,/tmp/venv-lc,autogen-agentchat/autogen-ext==0.7.5):
+实测环境(2026-10-11,autogen-agentchat/autogen-ext==0.7.5):
 - 非官方模型名(glm-4-flash / glm-5.3-flash)不被 autogen-ext 内置模型表
   识别,必须显式传 model_info(否则 ValueError: model_info is required)。
 - anthropic SDK:autogen-ext 0.7.5 固定发送 temperature,而 anthropic>=1.13.0
@@ -15,8 +15,8 @@
 - 断言依据:SYSTEM_MESSAGE 全文含 "## Response Modes"(Beginner/
   Interview/Project delivery/Debugging),真实生效则回答含任一模式词。
 
-运行方式(需先 source /tmp/glm_keys.env 或自行 export GLM_API_KEY 等):
-    /tmp/venv-lc/bin/python -m unittest evaluation.runtime.test_glm_e2e_autogen -v
+运行方式(需先通过环境变量设置 GLM_API_KEY 等):
+    python3 -m unittest evaluation.runtime.test_glm_e2e_autogen -v
 
 无 GLM_API_KEY 时整类 skipTest(密钥缺失不算失败)。
 """
@@ -26,7 +26,6 @@ from __future__ import annotations
 import asyncio
 import importlib.util
 import os
-import shutil
 import sys
 import time
 import unittest
@@ -36,13 +35,14 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from evaluation.runtime._artifacts import artifact_root
+
 SKILL_DIR = PROJECT_ROOT / "examples" / "agent-fullcycle-engineering"
-OUT_AUTOGEN = Path("/tmp/e2e/autogen")
+OUT_AUTOGEN: Path
 
 QUESTION = "这个 skill 有哪几种 Response Modes?只列名字"
 MODE_WORDS = ("Beginner", "Interview", "Project delivery", "Debugging")
 TIMEOUT_S = 120  # asyncio.wait_for 预算;失败重试一次
-GLM_KEYS_FILE = Path("/tmp/glm_keys.env")
 
 # 非官方模型名(GLM 系)不被 autogen-ext 内置模型表识别,需显式能力声明
 MODEL_INFO = {
@@ -55,30 +55,14 @@ MODEL_INFO = {
 }
 
 
-def _load_glm_env() -> None:
-    """测试自包含:GLM_* 未注入时从 /tmp/glm_keys.env 读(只进进程 env,不落仓库)。"""
-    if os.environ.get("GLM_API_KEY"):
-        return
-    if not GLM_KEYS_FILE.is_file():
-        return
-    for line in GLM_KEYS_FILE.read_text(encoding="utf-8").splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, _, value = line.partition("=")
-        key, value = key.strip(), value.strip().strip('"').strip("'")
-        if key and key not in os.environ:
-            os.environ[key] = value
-
 
 class GLME2EAutogenTest(unittest.TestCase):
     """autogen 转换产物 × GLM 双协议真实推理(真实 run,断言模式词)。"""
 
     @classmethod
     def setUpClass(cls):
-        _load_glm_env()
         if not os.environ.get("GLM_API_KEY"):
-            raise unittest.SkipTest("GLM_API_KEY 未设置(且 /tmp/glm_keys.env 不可用),整类跳过")
+            raise unittest.SkipTest("GLM_API_KEY 未设置,整类跳过")
         try:
             from autogen_agentchat.agents import AssistantAgent  # noqa: F401
             from autogen_ext.models.openai import OpenAIChatCompletionClient  # noqa: F401
@@ -95,7 +79,8 @@ class GLME2EAutogenTest(unittest.TestCase):
         from converter.skill_loader import load_skill
 
         ir = load_skill(SKILL_DIR)
-        shutil.rmtree(OUT_AUTOGEN, ignore_errors=True)
+        global OUT_AUTOGEN
+        OUT_AUTOGEN = artifact_root(cls) / "autogen"
         EMITTERS["autogen"](ir, OUT_AUTOGEN)
 
         spec = importlib.util.spec_from_file_location("e2e_autogen_agent", OUT_AUTOGEN / "agent.py")

@@ -1,0 +1,2 @@
+# Byte-exact comparison evidence intentionally includes CRLF and trailing spaces.
+evaluation/preservation/skillkit-output/** -text -whitespace

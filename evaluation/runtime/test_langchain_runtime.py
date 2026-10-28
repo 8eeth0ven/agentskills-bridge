@@ -6,10 +6,10 @@
 解析入口(_list_skills + FilesystemBackend)加载产物 skills/ 目录。
 
 运行方式(项目根目录):
-    /tmp/venv-lc/bin/python -m unittest evaluation.runtime.test_langchain_runtime -v
+    python3 -m unittest evaluation.runtime.test_langchain_runtime -v
 
 覆盖(对应任务 a-e):
-    a. test_a_agent_py_import —— importlib 加载 /tmp/rt/langchain/agent.py,
+    a. test_a_agent_py_import —— importlib 加载 临时产物 langchain/agent.py,
        断言 langchain.agents.create_agent / langchain.chat_models.init_chat_model /
        langchain_core.tools.tool 真实可导入且模块顶层零副作用(导入不需要
        provider 包或 API key;组装在 build_agent() 工厂里延迟发生)。
@@ -27,7 +27,7 @@
        d2 test_d2_skills_loading —— 在已装 deepagents 包源码里确认 SKILL.md
           引用入口(等价 grep -r "SKILL" site-packages/deepagents/),再用
           包内解析函数 _list_skills(FilesystemBackend, "skills") 真实加载
-          /tmp/rt/deepagents/skills/agent-fullcycle-engineering,断言
+          临时产物 deepagents/skills/agent-fullcycle-engineering,断言
           name/description 被识别。
        d3 test_d3_deepagents_fake_round —— 模块 build_agent(model=RecordingFake)
           跑一轮,断言返回消息;并断言 SkillsMiddleware 把技能 name/description
@@ -41,7 +41,6 @@ from __future__ import annotations
 
 import importlib.util
 import inspect
-import shutil
 import sys
 import traceback
 import unittest
@@ -51,9 +50,11 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
+from evaluation.runtime._artifacts import artifact_root
+
 SKILL_DIR = PROJECT_ROOT / "examples" / "agent-fullcycle-engineering"
-OUT_LANGCHAIN = Path("/tmp/rt/langchain")
-OUT_DEEPAGENTS = Path("/tmp/rt/deepagents")
+OUT_LANGCHAIN: Path
+OUT_DEEPAGENTS: Path
 SKILL_NAME = "agent-fullcycle-engineering"
 DESC_HEAD = "End-to-end AI agent engineering workflow"
 
@@ -124,8 +125,10 @@ class LangChainRuntimeTest(unittest.TestCase):
         from converter.skill_loader import load_skill
 
         ir = load_skill(SKILL_DIR)
-        for out in (OUT_LANGCHAIN, OUT_DEEPAGENTS):
-            shutil.rmtree(out, ignore_errors=True)
+        global OUT_LANGCHAIN, OUT_DEEPAGENTS
+        artifacts = artifact_root(cls)
+        OUT_LANGCHAIN = artifacts / "langchain"
+        OUT_DEEPAGENTS = artifacts / "deepagents"
         EMITTERS["langchain"](ir, OUT_LANGCHAIN)
         EMITTERS["deepagents"](ir, OUT_DEEPAGENTS)
 

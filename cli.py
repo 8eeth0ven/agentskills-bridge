@@ -25,14 +25,14 @@ PROJECT_ROOT = Path(__file__).resolve().parent
 WIKI_ROOT = PROJECT_ROOT / "llm-wiki"
 
 
-def _load_ir(path: str, source: str):
+def _load_ir(path: str, source: str, native_only: bool = False):
     if source == "skill":
-        return load_skill(path)
+        return load_skill(path, native_only=native_only)
     from converter.parsers import PARSERS
 
     if source not in PARSERS:
         raise SystemExit(f"unsupported --from: {source} (choose from {sorted(PARSERS)})")
-    return PARSERS[source](path)
+    return PARSERS[source](path, native_only=native_only)
 
 
 def cmd_skill2agent(args) -> int:
@@ -40,7 +40,7 @@ def cmd_skill2agent(args) -> int:
 
     if args.target not in EMITTERS:
         raise SystemExit(f"unsupported --target: {args.target} (choose from {sorted(EMITTERS)})")
-    ir = load_skill(args.skill_dir)
+    ir = load_skill(args.skill_dir, native_only=args.native_only)
     out = Path(args.out)
     EMITTERS[args.target](ir, out)
     emitted = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
@@ -51,7 +51,7 @@ def cmd_skill2agent(args) -> int:
 
 
 def cmd_agent2skill(args) -> int:
-    ir = _load_ir(args.path, args.source)
+    ir = _load_ir(args.path, args.source, args.native_only)
     out = write_skill(ir, args.out, copy_scripts_from=args.scripts_from)
     emitted = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
     print(f"[ok] {args.source} -> skill: {out} ({len(emitted)} files)")
@@ -72,7 +72,7 @@ def cmd_ir(args) -> int:
             source = "generic"
         else:
             source = "crewai"
-    ir = _load_ir(args.path, source)
+    ir = _load_ir(args.path, source, args.native_only)
     payload = ir.to_json()
     if args.out:
         Path(args.out).write_text(payload + "\n", encoding="utf-8")
@@ -114,23 +114,36 @@ def cmd_convert(args) -> int:
     内部即 PARSERS[source] → AgentIR → EMITTERS[target],与两步等价;
     skill 输入走 load_skill。--scripts-from 仅在产出 skill 类目录时生效。
     """
-    if args.source == "skill":
-        ir = load_skill(args.path)
-    else:
-        from converter.parsers import PARSERS
-
-        if args.source not in PARSERS:
-            raise SystemExit(f"unsupported --from: {args.source} (choose from {sorted(PARSERS)})")
-        ir = PARSERS[args.source](args.path)
+    ir = _load_ir(args.path, args.source, args.native_only)
     from converter.emitters import EMITTERS
 
-    if args.target not in EMITTERS:
+    if args.target not in EMITTERS and args.target != "skill":
         raise SystemExit(f"unsupported --target: {args.target} (choose from {sorted(EMITTERS)})")
-    out = EMITTERS[args.target](ir, args.out)
+    out = write_skill(ir, args.out) if args.target == "skill" else EMITTERS[args.target](ir, args.out)
     emitted = sorted(str(p.relative_to(out)) for p in out.rglob("*") if p.is_file())
     print(f"[ok] {args.source} -> {args.target}: {out} ({len(emitted)} files)")
     for rel in emitted:
         print(f"  - {rel}")
+    return 0
+
+
+def cmd_verify(args) -> int:
+    """Verify the native file set, capsule IR, source bytes and file modes."""
+    from converter.preservation import find_capsule, read_capsule, PreservationError
+    root = find_capsule(args.path)
+    if root is None:
+        raise PreservationError("no preservation capsule found")
+    ir, manifest = read_capsule(root)
+    result = {"ok": True, "format": manifest["format"],
+              "native_files": len(manifest["artifacts"]),
+              "source_files": len(ir.source_files),
+              "tools": len(ir.tools), "tasks": len(ir.tasks)}
+    if args.json:
+        import json
+        print(json.dumps(result, ensure_ascii=False, sort_keys=True))
+    else:
+        print(f"[ok] {result['format']}: {result['native_files']} native files verified; "
+              f"{result['source_files']} source files, {result['tools']} tools, {result['tasks']} tasks preserved")
     return 0
 
 
@@ -148,7 +161,7 @@ def main(argv=None) -> int:
                  "langflow", "openai", "claude-subagent", "generic", "autogen",
                  "n8n", "mermaid-workflow"],
     )
-    p0.add_argument("--target", required=True, choices=sorted(TARGET_FORMATS))
+    p0.add_argument("--target", required=True, choices=sorted((*TARGET_FORMATS, "skill")))
     p0.add_argument("--out", required=True)
     p0.set_defaults(func=cmd_convert)
 
@@ -180,13 +193,26 @@ def main(argv=None) -> int:
     p3.add_argument("--out", default=None)
     p3.set_defaults(func=cmd_ir)
 
+    for command in (p0, p1, p2, p3):
+        command.add_argument("--native-only", action="store_true",
+                             help="explicitly import native files, ignoring the preservation capsule")
+
+    p5 = sub.add_parser("verify", help="verify a preservation capsule and all native artifacts")
+    p5.add_argument("path")
+    p5.add_argument("--json", action="store_true", help="machine-readable verification summary")
+    p5.set_defaults(func=cmd_verify)
+
     p4 = sub.add_parser("wiki", help="read-only access to llm-wiki")
     p4.add_argument("wiki_cmd", choices=["list", "read", "verify"])
     p4.add_argument("chapter", nargs="?", default=None)
     p4.set_defaults(func=cmd_wiki)
 
     args = parser.parse_args(argv)
-    return args.func(args)
+    try:
+        return args.func(args)
+    except (ValueError, OSError) as exc:
+        print(f"[error] {exc}", file=sys.stderr)
+        return 1
 
 
 if __name__ == "__main__":

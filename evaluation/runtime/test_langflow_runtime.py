@@ -6,7 +6,7 @@
 往返文本无损。
 
 运行方式(项目根目录):
-    /tmp/venv-lf/bin/python -m unittest evaluation.runtime.test_langflow_runtime -v
+    python3 -m unittest evaluation.runtime.test_langflow_runtime -v
 
 引擎与入口(2026-10 实测,langflow==1.12.5 / lfx==1.12.5,Python 3.13 venv):
     - 主入口:langflow.load.load_flow_from_json(flow: Path|str|dict) -> Graph
@@ -20,7 +20,7 @@
 
 覆盖(对应任务 b-d;a 为产物前提):
     a. test_a_emit_artifacts —— demo IR(中文+中英引号 system_prompt)emit 到
-       /tmp/rt/langflow,断言 flow.json 含 4 个官方类型节点且模板带 code 字段
+       临时产物目录 langflow,断言 flow.json 含 4 个官方类型节点且模板带 code 字段
        (真实引擎实例化的必需字段,见下方修复记录)。
     b. test_b_engine_load —— load_flow_from_json(flow.json) 不抛异常,
        Graph 识别出 4 个 vertex(ChatInput/Prompt/LanguageModelComponent/
@@ -50,7 +50,6 @@ langflow 不可 import 时整类 skipTest(pip/网络问题不判失败)。
 
 from __future__ import annotations
 
-import shutil
 import sys
 import traceback
 import unittest
@@ -60,7 +59,9 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-OUT_LANGFLOW = Path("/tmp/rt/langflow")
+from evaluation.runtime._artifacts import artifact_root
+
+OUT_LANGFLOW: Path
 
 # demo system_prompt:中文 + 全角引号「」《》+ 英文双引号 + em-dash + {message} 变量
 DEMO_PROMPT = (
@@ -112,7 +113,8 @@ class LangflowRuntimeTest(unittest.TestCase):
             metadata={"model": "gpt-4.1"},
         )
         cls.demo_prompt = DEMO_PROMPT
-        shutil.rmtree(OUT_LANGFLOW, ignore_errors=True)
+        global OUT_LANGFLOW
+        OUT_LANGFLOW = artifact_root(cls) / "langflow"
         emit_langflow(ir, OUT_LANGFLOW)
 
     # ---------- 公共辅助 ----------
