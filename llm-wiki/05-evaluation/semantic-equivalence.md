@@ -1,9 +1,9 @@
 # 语义等价验证标准
 
-字符级指标(`F_prompt` 等,见 [roundtrip-fidelity](roundtrip-fidelity.md))度量的是**字面保真**;本章定义与之互补的**语义等价**三层验证体系——结构、术语、行为各占一层。层名、指标名与方法以本章为唯一真相,实现侧不得偏离。
+字符级指标(`F_prompt` 等,见 [roundtrip-fidelity](roundtrip-fidelity.md))度量的是**字面保真**;本章定义与之互补的**语义等价**三层验证体系——结构、术语、行为各占一层。本章提供方法说明,不依赖随仓库分发的测试脚本或历史成绩。
 
-- L1/L2 实现:`evaluation/semantics.py`(纯规则,零外部依赖,已并入 `evaluation/run_eval.py` 汇总,结果矩阵新增 `S_struct` / `S_terms` 两列)
-- L3 实现:`evaluation/behavior/`(真实 LLM 调用,需 GLM key)
+- L1/L2 可通过规则独立检查字段、顺序和术语。
+- L3 需要调用者自行配置模型并进行同题对照。
 
 ## 为什么字符级不够
 
@@ -20,7 +20,7 @@
 |----|------|------|------|------|
 | L1 | 结构等价 | 规则:tasks LCS 保序率 + 知识文件集 Jaccard + name/desc 全等 | 零 | `S_struct ∈ [0,1]` |
 | L2 | 术语保留 | 规则:数字 / 限定词 / 否定 / 强命令 / 专有名词 五类 token 保留率 | 零 | `S_terms ∈ [0,1]` |
-| L3 | 行为等价 | 真实 LLM:原形态与转换形态同题同模型对照,LLM judge 判一致 | GLM key | A-B / A-C 一致率 |
+| L3 | 行为等价 | 真实 LLM:原形态与转换形态同题同模型对照,LLM judge 判一致 | 调用者配置的模型 | 对照一致率 |
 
 - **L1 结构等价**:roundtrip 后 tasks 序列做最长公共子序列(LCS),保序率 = LCS 长度 / 原序列长度;知识文件集按文件名求 Jaccard;name / description 归一化全等。三要素合成 `S_struct`——顺序调换在 LCS 层直接暴露。
 - **L2 术语保留**:从原文提取五类承载语义的 token——数字(阈值 / 步数 / 版本号)、限定词(only / must / at most)、否定(not / never / 禁止)、强命令(must / shall / 一定要)、专有名词(模型名 / 工具名 / 文件名)——逐类统计 roundtrip 后的保留率,加权合成 `S_terms`。否定词与数字丢失在该层暴露。
@@ -35,21 +35,21 @@
 
 ## 语义审计已修复的缺陷
 
-三层体系不是纸面设计——它钉出过两类真实缺陷并已修复(修复均在 `converter/` 侧,证据可复现):
+以下两类缺陷说明为什么需要检查角色与拓扑；对应处理逻辑位于转换器中：
 
 | 编号 | 缺陷 | 根因 | 修复 |
 |------|------|------|------|
 | P1 | 多 agent 角色丢失:crewai 多 agent 项目转 workflow 后,节点只知「做什么」,不知「谁以什么角色做」 | tasks.yaml 常不写 agent 字段(运行时分配),IR.tasks 的 agent 为空 | `converter/wir.py`:节点 prompt 前缀 `As <role>. Goal: <goal>`;task 未标 agent 且 agent 数与 task 数相等时按序对齐(crewai 常见模式) |
 | P2 | 分支 DAG 压扁:n8n 分支(A→B 且 A→C)被压成线性链 | tasks/chain 是图的线性投影,分支边无处安放 | `converter/parsers/n8n.py`:完整边表存 `metadata.graph_edges`;`converter/emitters/n8n.py`:重建 connections 时优先按 graph_edges 还原分支 |
 
-修复证据:
+检查示例：
 
-- **P1**:crewAI-examples 真实项目 screenplay_writer(5 agents / 5 tasks)转 n8n,5/5 节点 prompt 均带角色前缀(如 `As spamfilter. Goal: Decide whether a text is spam or not.`)。
+- **P1**:多角色项目转成工作流后，检查节点指令是否携带正确的角色和目标，而不只包含任务描述。
 - **P2**:构造 A→B / A→C 分支的 n8n workflow,经 generic(agent.json 内嵌 `metadata.graph_edges`)roundtrip 回 n8n,connections 仍为分支:`{Chat Trigger→A, A→B, A→C}`。
 
 ## 局限
 
 - L3 依赖真实 LLM,温度 > 0 带来随机性——同题重跑一致率会波动,90% 阈值已留余量但不消除方差。
-- 探针覆盖有限:当前探针为单轮短题,未测长上下文与多轮对话场景下的行为漂移。
+- 探针覆盖有限：单轮短题无法代表长上下文、多轮对话及真实工具调用场景，应按实际用途设计输入。
 - L2 术语表是启发式:五类 token 之外的语义载体(如隐喻、语气的强弱)不在统计内,专有名词识别可能漏类别。
 - 行为等价 ≠ 输出逐字等价:L3 判的是回答语义一致,允许措辞与组织差异——这与字符级指标的口径不同,两者互补而非替代。

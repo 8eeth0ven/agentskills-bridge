@@ -1,7 +1,7 @@
 """Generic emitter:AgentIR -> 框架无关的规范序列化。
 
 产出:
-    <out>/agent.json     AgentIR 规范 JSON 序列化(ir.to_json())
+    <out>/agent.json     AgentIR 便携 JSON 序列化(移除本机来源路径)
     <out>/knowledge/*.md 知识文档按 filename 拷贝
     <out>/README.md      agent.json 字段说明与读取方式
 """
@@ -19,7 +19,8 @@ def emit_generic(ir: AgentIR, out_dir: str | Path) -> Path:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     _write_knowledge(ir, out)
-    (out / "agent.json").write_text(ir.to_json() + "\n", encoding="utf-8")
+    from converter.preservation import portable_ir
+    (out / "agent.json").write_text(portable_ir(ir).to_json() + "\n", encoding="utf-8")
     (out / "README.md").write_text(_readme(ir), encoding="utf-8")
     return out
 
@@ -74,7 +75,7 @@ def _readme(ir: AgentIR) -> str:
 | system_prompt | 主指令 |
 | default_prompt | UI 默认提示词 |
 | tools | 工具契约(name/description/input_schema/side_effects) |
-| knowledge | 知识文档清单(filename/title/content/source_path) |
+| knowledge | 知识文档清单(filename/title/content;本机 source_path 留空) |
 | tasks | 任务步骤 |
 | scripts | 附带脚本相对路径 |
 | metadata | 其他元数据 |

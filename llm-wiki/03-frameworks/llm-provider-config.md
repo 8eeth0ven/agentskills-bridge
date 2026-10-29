@@ -212,9 +212,9 @@ langflow 的 LanguageModelComponent 目前 provider 下拉**没有 GLM 选项**�
 
 ## 5. 密钥纪律
 
-- key 只经**环境变量 / shell 配置(`~/.zshrc`)/ `.env`(须在 `.gitignore`)** 注入,任何情况不写进代码、不提交 git。
+- key 只经**环境变量或明确配置的密钥管理服务** 注入,任何情况不写进代码、不提交 git。
 - 仓库内文档、示例代码一律用 `os.environ["GLM_API_KEY"]` 形式占位。
-- 本仓库 runtime 测试统一读 **`GLM_API_KEY`** 环境变量;Claude 侧示例读 `ANTHROPIC_API_KEY`、OpenAI 侧读 `OPENAI_API_KEY`。
+- GLM 示例读 `GLM_API_KEY`；Claude 侧示例读 `ANTHROPIC_API_KEY`，OpenAI 侧示例读 `OPENAI_API_KEY`。
 - GLM key 为 `id.secret` 两段式,泄露任一段都不构成防护,按整体敏感对待。
 
 ---

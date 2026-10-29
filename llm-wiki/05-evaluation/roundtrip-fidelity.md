@@ -1,10 +1,6 @@
 # Roundtrip 保真度评测体系
 
-本章定义 skill ↔ agent 双向转换的质量评测规范,与 `evaluation/metrics.py` 实现对齐——指标名与公式以本章为唯一真相,字段名不得改。评测回答两个问题:正向产物是否合规(forward),以及 skill → agent → skill 往返后信息保留了多少(roundtrip)。
-
-- 指标实现:`evaluation/metrics.py`
-- 运行入口:`evaluation/run_eval.py`
-- 结果落盘:`evaluation/results.json` / `evaluation/results.md`
+本章保留 skill ↔ agent 双向转换的质量评估方法,用于理解原生格式映射与资产恢复的区别。它回答两个问题:正向产物是否合规(forward),以及 skill → agent → skill 往返后信息保留了多少(roundtrip)。这些指标是方法说明,仓库不再分发测试脚本、测试语料或评测报告。
 
 ## 指标定义
 
@@ -24,17 +20,17 @@
 
 - `max_len(a, b) = max(len(a), len(b))`;双方皆空串时编辑距离项定义为 1(即全等)。
 - `F_know_c` 只数"配对成功且 sha256 一致"的文件;out 侧多出的文件不计分,逐条记入 `L`。
-- `V_format` 的校验规则按各 target 的产物契约执行(见 `/llm-wiki/04-conversion/skill-to-agent.md` §3)。
+- `V_format` 的校验规则按各 target 的产物契约执行(见 [skill-to-agent](../04-conversion/skill-to-agent.md))。
 
-## 测试集
+## 输入覆盖建议
 
 | 语料 | 内容 | 覆盖意图 |
 |------|------|----------|
-| `S1_real` | 真实 skill `agent-fullcycle-engineering`(仓库 `examples/` 内) | 真实形态:长正文 + references + scripts + `agents/openai.yaml` 三件套 |
-| `S2_cn` | 合成 skill:中文正文 + 引号 + emoji + 多级列表 | 压力面:非 ASCII、YAML 引号陷阱、嵌套 markdown 结构 |
-| `S3_min` | 极简 skill:仅 `SKILL.md`(name + description + 正文) | 下界:无 references/scripts/interface,验证空列表路径不崩 |
+| 真实技能包 | 真实 skill `agent-fullcycle-engineering`(仓库 `examples/` 内) | 真实形态:长正文 + references + scripts + `agents/openai.yaml` 三件套 |
+| 中文与结构边界 | 合成 skill:中文正文 + 引号 + emoji + 多级列表 | 压力面:非 ASCII、YAML 引号陷阱、嵌套 markdown 结构 |
+| 极简技能包 | 极简 skill:仅 `SKILL.md`(name + description + 正文) | 下界:无 references/scripts/interface,验证空列表路径不崩 |
 
-三语料为固定样本随仓库分发,保证评测可复现。
+选择输入时还应覆盖二进制附件、递归参考目录、可执行权限、扩展 frontmatter、空文件和 CRLF。上表描述输入类别,不对应随仓库分发的测试集。
 
 ## 实验矩阵
 
@@ -43,7 +39,7 @@
 - **forward**:skill → `load_skill` → `emit_<fmt>`,测 `V_format` + `L`;
 - **roundtrip**:skill → emit → 对应 parser → `write_skill`,测全部 F 指标(`F_name` / `F_desc` / `F_prompt` / `F_know_q` / `F_know_c`)。
 
-3 corpus × 8 target = 24 组合,逐样本记录后再按 corpus × target 聚合。8 个 target 及其反向解析入口:
+对每种输入分别运行所需目标,逐样本记录后再按输入与目标格式聚合。当前 11 个 target 及其反向解析入口:
 
 | target | 反向解析入口(roundtrip 起点) |
 |--------|------------------------------|
@@ -55,20 +51,24 @@
 | `openai` | 产物根目录(`instructions.md` + `agents/openai.yaml`) |
 | `claude-subagent` | 产物根目录(`.claude/agents/*.md`,frontmatter + 正文) |
 | `generic` | `agent.json` |
+| `autogen` | `agent.py` |
+| `n8n` | `workflow.json` |
+| `mermaid-workflow` | `workflow.md` |
 
-预期量级(供 sanity check,非硬门槛):`generic` 应全指标 1.0(`agent.json` 与 IR 互逆零损);`crewai-skills` 接近 1.0(SKILL.md 原生往返);`crewai` 的 `F_prompt` 因 `backstory()` 截断到 1200 字符而低于 1——这是已知有损点(见 skill-to-agent.md §5),不是评测 bug。
+## 原生映射与资产完整性
 
-## 复现
+通过公开 `EMITTERS` / `PARSERS` 注册表转换时，Preservation Capsule 保存目标原生格式无法表达的 IR 字段与原始普通文件。验证完整性时应检查整个输出目录，而不是只复制一个配置文件：
 
+```bash
+python3 cli.py skill2agent examples/agent-fullcycle-engineering --target langchain --out out/langchain
+python3 cli.py verify out/langchain
+python3 cli.py agent2skill out/langchain --from langchain --out out/restored
 ```
-python3 evaluation/run_eval.py
-```
 
-- 全矩阵(3 corpus × 8 target,forward + roundtrip)一次跑完,逐行打印进度。
-- 结果落盘:`evaluation/results.json`(机器可读:逐样本指标 + 聚合值)与 `evaluation/results.md`(人读汇总表)。
+`verify` 核对当前包的原生产物、IR 与源文件清单。要判断往返是否保持原始资产，还需逐项比较输入与恢复目录的文件集合、字节和 POSIX 权限。原生格式字段的检查应独立进行，不能以 capsule 成功读回替代真实运行时验证。协议细节见 [INTERFACE.md](../../INTERFACE.md)。
 
 ## 指标局限
 
 - `F_desc` / `F_prompt` 用字符级 levenshtein,度量字面保真而非语义等价——往返重组后语义等价但措辞有变的产物会被低估。
 - `V_format` 是产物静态校验(结构 + 语法),不是端到端运行验证——通过 `V_format` 不代表目标框架真跑得通。
-- `S2_cn` / `S3_min` 为合成语料,不覆盖真实 skill 的全部形态(超长正文、多 references、frontmatter 扩展键、依赖运行时的 scripts),结论外推到任意生产 skill 需谨慎。
+- 合成输入不覆盖真实 skill 的全部形态；超长正文、frontmatter 扩展、递归资源与依赖运行时的脚本需要分别检查。

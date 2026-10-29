@@ -82,7 +82,7 @@ dependencies:
 """note_agent —— OpenAI Agents SDK 最小实现。
 
 依赖: pip install -U openai-agents
-运行: export OPENAI_API_KEY=sk-... && python note_agent.py
+运行: 配置 OPENAI_API_KEY 环境变量后运行 python note_agent.py
 """
 from agents import Agent, Runner, function_tool
 

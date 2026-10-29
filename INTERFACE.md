@@ -76,7 +76,7 @@ manifest 包含 `schema_version: 1`、目标 `format`、`ir_sha256`，以及原�
 
 1. 实现原生 `emit_<fmt>(ir, out_dir) -> Path` 与 `parse_<fmt>(path) -> AgentIR`。
 2. 在两侧注册表和 `TARGET_FORMATS` 中注册，CLI 使用同一格式集合。
-3. 加原生产物字段测试，再跑全部格式对的 capsule/资源恢复测试。
+3. 验证原生产物字段，再检查格式间的 capsule 与资源恢复。
 4. 在格式文档说明原生可表达字段、降级点与运行前需要的配置。
 
-新增格式的验证必须分别覆盖原生映射和 capsule，不能只测试保存的 IR 被原样读回。
+新增格式的验证必须分别覆盖原生映射和 capsule，不能只确认保存的 IR 被原样读回。

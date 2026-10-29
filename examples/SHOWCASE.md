@@ -214,17 +214,28 @@ description: Agent that generates focused plans, conducts web searches, and
 
 ## 案例 8:中文 skill → 全部 9 种目标 + 逐字节 roundtrip
 
-输入为中文语料(含多级列表、代码块、引号、emoji),一次转全部 9 种目标再从 langflow 产物还原:
+可先在输出目录创建一个中文 skill，然后转到 9 种 agent 格式，再从 langflow 产物还原：
 
 ```bash
+mkdir -p out/case8-source
+cat > out/case8-source/SKILL.md <<'SKILL'
+---
+name: chinese-example
+description: 中文转换示例
+---
+# 中文示例 🧭
+
+1. 保留“引号”和列表。
+2. 检查知识与资源的完整性。
+SKILL
 for t in crewai crewai-skills deepagents langchain langflow openai claude-subagent autogen generic; do
-  python3 cli.py skill2agent evaluation/corpus/S2_cn --target $t --out out/case8/$t
+  python3 cli.py skill2agent out/case8-source --target $t --out out/case8/$t
 done
 python3 cli.py agent2skill out/case8/langflow --from langflow --out out/case8-back
-diff evaluation/corpus/S2_cn/SKILL.md out/case8-back/SKILL.md
+diff out/case8-source/SKILL.md out/case8-back/SKILL.md
 ```
 
-实际结果:9 个 target 全部成功;`diff` 无输出——**中文 SKILL.md 经 flow.json 编码往返后逐字节一致**。
+保留完整 capsule 时，回程应恢复源 SKILL.md；`diff` 无输出表示这一文件的字节一致。包完整性还可用 `python3 cli.py verify out/case8/langflow` 检查。
 
 ## 案例 9:skill → workflow(n8n / mermaid-workflow)
 
@@ -297,8 +308,8 @@ python3 cli.py convert out/c10-branch-generic --from generic --target n8n --out 
 
 实际输出:connections 仍为分支——`{Chat Trigger→A, A→B, A→C}`,未被压成线性链(`converter/parsers/n8n.py` 保留完整边表,`converter/emitters/n8n.py` 重建时优先还原)。经 **skill 形态**中转(`agent2skill` 再 `--target n8n`)同样保分支:分支边表序列化进 SKILL.md frontmatter 的 `metadata:` 键(agentskills.io 规范允许的扩展对象,单行 JSON),`load_skill` 读回——语义审计阶段该路径曾退化为线性链,已修复并实测往返保留。
 
-**语义验证**:以上案例的语义质量由三层体系把关(标准见 [semantic-equivalence](../llm-wiki/05-evaluation/semantic-equivalence.md))——L1 结构等价(`S_struct`)与 L2 术语保留(`S_terms`)已并入 `python3 evaluation/run_eval.py` 汇总矩阵(当前全语料两列 1.0),L3 行为等价(原形态与转换形态同题同模型对照)探针位于 `evaluation/behavior/`。
+**语义检查**：结构、术语与实际行为需要分别判断，方法见 [semantic-equivalence](../llm-wiki/05-evaluation/semantic-equivalence.md)。capsule 的完整性校验不能替代目标框架的真实执行检查。
 
 ---
 
-各能力(name/正文/知识/scripts/工具契约)在 11 种形态(9 种 agent + n8n / mermaid-workflow 两种 workflow)下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md);完整评测见 [evaluation/REPORT.md](../evaluation/REPORT.md)。
+各能力(name/正文/知识/scripts/工具契约)在 11 种形态(9 种 agent + n8n / mermaid-workflow 两种 workflow)下的保留与降级情况,见 [能力对照矩阵](CAPABILITY-MATRIX.md)；完整资产恢复协议见 [INTERFACE.md](../INTERFACE.md)。

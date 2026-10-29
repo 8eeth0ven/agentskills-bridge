@@ -11,7 +11,7 @@
     - Prompt 的提示词文本在 data.node.template.template.value;
     - LLM 用 LanguageModelComponent(model_name/provider/api_key),Prompt 输出接 system_message。
 
-2026-10 真实引擎验证修复(langflow 1.12.5,evaluation/runtime/test_langflow_runtime.py):
+2026-10 真实引擎兼容性修复(langflow 1.12.5):
     - bug:模板缺 `template.code` 字段。引擎 Graph.from_payload 默认实例化组件,
       instantiate_class 里 `custom_params.pop("code")` 直接 KeyError('code'),
       flow 无法通过真实引擎加载(官方导出一律内嵌组件完整源码)。

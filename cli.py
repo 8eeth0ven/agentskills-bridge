@@ -73,7 +73,8 @@ def cmd_ir(args) -> int:
         else:
             source = "crewai"
     ir = _load_ir(args.path, source, args.native_only)
-    payload = ir.to_json()
+    from converter.preservation import portable_ir
+    payload = portable_ir(ir).to_json()
     if args.out:
         Path(args.out).write_text(payload + "\n", encoding="utf-8")
         print(f"[ok] IR written to {args.out}")

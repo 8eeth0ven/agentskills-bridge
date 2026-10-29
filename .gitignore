@@ -8,7 +8,6 @@ venv/
 # 密钥与本地环境(永不入库)
 *.env
 *.key
-glm_keys.env
 
 # 系统/编辑器
 .DS_Store
@@ -18,7 +17,5 @@ glm_keys.env
 # Playwright/browser MCP artifacts
 .playwright-mcp/
 
-# Generated conversions, previews and optional evaluation runs
+# Generated conversions and previews
 out/
-evaluation/behavior/latest/
-evaluation/external/latest/

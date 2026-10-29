@@ -11,7 +11,7 @@ LangChain 的 agent 由三部分组成:模型(`init_chat_model` 统一入口)、
 """note_agent —— 最小 LangChain agent。
 
 依赖: pip install -U langchain langchain-openai
-运行: export OPENAI_API_KEY=sk-... && python agent.py
+运行: 配置 OPENAI_API_KEY 环境变量后运行 python agent.py
 """
 import os
 
