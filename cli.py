@@ -148,6 +148,66 @@ def cmd_verify(args) -> int:
     return 0
 
 
+def cmd_migrate(args) -> int:
+    """Run real model analysis, native code generation and execution repair."""
+    import json
+    from converter.ai_context import Redactor
+    from converter.ai_migration import MigrationFailed, migrate
+    from converter.ai_provider import ModelClient
+
+    if args.report:
+        report_path = Path(args.report).resolve()
+        output_path = Path(args.out).resolve()
+        if report_path == output_path or output_path in report_path.parents:
+            raise ValueError("--report must be outside --out; the project already contains migration.json")
+        source_path = Path(args.path).resolve()
+        if report_path == source_path or (source_path.is_dir() and source_path in report_path.parents and report_path.exists()):
+            raise ValueError("--report cannot overwrite a source input file")
+    external = json.loads(Path(args.acceptance).read_text(encoding="utf-8")) if args.acceptance else None
+    if args.acceptance and not isinstance(external, list):
+        raise ValueError("external acceptance must be a JSON array")
+    runtime = json.loads(args.runtime_command) if args.runtime_command else None
+    if runtime is not None and (not isinstance(runtime, list) or not runtime or any(not isinstance(item, str) for item in runtime)):
+        raise ValueError("--runtime-command must be a JSON array of argv strings")
+    client = ModelClient(provider=args.provider, model=args.model, base_url=args.base_url,
+                         api_key_env=args.api_key_env, timeout=args.model_timeout,
+                         max_output_tokens=args.max_output_tokens, thinking=args.thinking)
+    ir = _load_ir(args.path, args.source, args.native_only)
+    redactor = Redactor(PROJECT_ROOT, args.path, args.out)
+
+    def progress(event):
+        print("[ai] " + json.dumps(event, ensure_ascii=False), file=sys.stderr, flush=True)
+
+    try:
+        report = migrate(ir, args.target, args.out, client, execute=args.execute,
+                         max_repairs=args.max_repairs, python_executable=args.python,
+                         timeout=args.runtime_timeout, runtime_command=runtime,
+                         acceptance=external, acceptance_path=args.acceptance, context_chars=args.context_chars,
+                         keep_failed=args.keep_failed, progress=progress,
+                         source_root=((Path(args.path) if Path(args.path).is_dir() else Path(args.path).parent)
+                                      if args.source != "skill" else None))
+    except MigrationFailed as exc:
+        report = exc.report
+        if args.report:
+            path = Path(args.report)
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(json.dumps(redactor.scrub(report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        print("[not verified] " + report["status"], file=sys.stderr)
+        for blocker in report.get("blockers", []):
+            print("  - " + redactor.text(str(blocker)), file=sys.stderr)
+        if report.get("attempts"):
+            for error in report["attempts"][-1]["validation"].get("errors", []):
+                print("  - " + redactor.text(str(error))[:4000], file=sys.stderr)
+        return 1
+    if args.report:
+        path = Path(args.report)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(redactor.scrub(report), ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(f"[verified] {args.source} -> {args.target}: {args.out}; "
+          f"{len(report['attempts'])} implementation attempts, {report['model_calls']} model calls")
+    return 0
+
+
 def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="agentskills-bridge", description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -207,6 +267,30 @@ def main(argv=None) -> int:
     p4.add_argument("wiki_cmd", choices=["list", "read", "verify"])
     p4.add_argument("chapter", nargs="?", default=None)
     p4.set_defaults(func=cmd_wiki)
+
+    p6 = sub.add_parser("migrate", help="AI semantic migration: analyze, generate, execute and repair")
+    p6.add_argument("path")
+    p6.add_argument("--from", dest="source", default="skill", choices=sorted(("skill", *TARGET_FORMATS)))
+    p6.add_argument("--target", required=True, choices=sorted(("skill", *TARGET_FORMATS)))
+    p6.add_argument("--out", required=True)
+    p6.add_argument("--provider", default="auto", choices=("auto", "anthropic", "openai", "openai-chat"))
+    p6.add_argument("--model", help="explicit model; otherwise use MIGRATION_MODEL or provider model environment")
+    p6.add_argument("--base-url", help="optional provider endpoint; credentials are read only from environment")
+    p6.add_argument("--api-key-env", help="name of the process environment variable containing the credential")
+    p6.add_argument("--execute", action="store_true", help="run generated code for behavioral and real native-runtime verification")
+    p6.add_argument("--python", default=sys.executable, help="runtime Python interpreter with target framework installed")
+    p6.add_argument("--max-repairs", type=int, default=3)
+    p6.add_argument("--model-timeout", type=float, default=120)
+    p6.add_argument("--runtime-timeout", type=float, default=30)
+    p6.add_argument("--max-output-tokens", type=int, default=16000)
+    p6.add_argument("--thinking", choices=("disabled",), help="optionally disable extended thinking on compatible Anthropic endpoints")
+    p6.add_argument("--context-chars", type=int, default=500000)
+    p6.add_argument("--acceptance", help="JSON file of additional frozen cases, withheld from initial generation")
+    p6.add_argument("--runtime-command", help="explicit native-host verification argv, encoded as a JSON array")
+    p6.add_argument("--report", help="optional redacted JSON report, including on a failed migration")
+    p6.add_argument("--keep-failed", action="store_true", help="retain unverified/failed generated project for inspection")
+    p6.add_argument("--native-only", action="store_true", help="use native source definitions instead of an existing capsule")
+    p6.set_defaults(func=cmd_migrate)
 
     args = parser.parse_args(argv)
     try:

@@ -1,6 +1,6 @@
-# 转换接口与保真契约
+# 迁移接口与保真契约
 
-Python ≥3.10，转换引擎无强制第三方依赖。公开转换路径为：
+Python ≥3.10，转换器本身无强制第三方依赖。AI 迁移需要模型凭据；执行目标工程需要对应框架。规则转换路径为：
 
 ```text
 skill / native definition → AgentIR → native projection + preservation capsule
@@ -34,6 +34,55 @@ ir = load_skill("out/skill", native_only=True)
 ```
 
 默认读取发现 capsule 时必须校验，不会在校验失败后偷偷降级为原生读取。显式原生导入放弃旧 capsule 独有的信息，新的转换包只承诺保存这次导入所得的 IR 和资产。
+
+## AI 语义迁移 API
+
+`converter.ai_migration.migrate` 在规则解析得到的 IR 上执行模型分析、生成、独立验收和修复。模型客户端为标准库 HTTP 实现：
+
+```python
+import os
+from pathlib import Path
+from converter.ai_provider import ModelClient
+from converter.ai_migration import migrate, MigrationFailed
+
+client = ModelClient(
+    provider="anthropic",
+    model=os.environ["ANTHROPIC_MODEL"],
+    api_key_env="ANTHROPIC_API_KEY",
+)
+ir = load_skill("examples/agent-fullcycle-engineering")
+try:
+    report = migrate(
+        ir, "langchain", "out/ai-langchain", client,
+        execute=True,
+        python_executable=str(Path(".venv-runtime/bin/python").resolve()),
+        max_repairs=3,
+    )
+except MigrationFailed as error:
+    report = error.report
+```
+
+`execute=False` 只生成和静态检查，不会得到成功状态；默认不会发布未通过工程。`keep_failed=True` 可保留已生成但未通过的工程供检查。源资料不足而没有可实现计划时，只有 `MigrationFailed.report`，不会虚构代码。
+
+核心参数：
+
+| 参数 | 作用 |
+| --- | --- |
+| `execute` | 明确执行生成代码；默认 False |
+| `python_executable` | 已安装真实目标依赖的运行解释器 |
+| `max_repairs` | 首次生成之后允许的实现修复次数 |
+| `timeout` | 单次执行的时间上限 |
+| `runtime_command` | 用户提供的真实宿主验收 argv；不经 shell |
+| `acceptance` | 额外冻结用例的 JSON 对象列表 |
+| `source_root` | 第三方原生工程的源目录，用于静态收集实际实现及资源 |
+| `context_chars` | 源及当前项目上下文上限，超限明确失败 |
+| `progress` | 接收脱敏阶段事件的可选回调 |
+
+分析计划与验收值在生成前冻结。实现阶段只返回允许的 `files` 变更，不能改写来源文件、验收期望、验证器或 `migration.json`。独立执行器接收输入并观察实际返回值，父进程将其与冻结期望比较；生成代码不会收到验收期望作为调用参数。
+
+`validate_project` 的成功需要实际执行与原生验收。LangChain、Deep Agents、AutoGen AgentChat、CrewAI 和 CrewAI Skills 由独立适配器验证；其他格式需要用户提供真实宿主命令。该命令的退出状态是用户选择的验收边界，不能将空操作命令解释为引擎运行证明。
+
+生成的工程包含真实工具模块、工作流模块、目标原生产物与 `migration.json`；保真 capsule 单独保存来源及完整性信息。模型推理调用、确定性注入模型的框架执行和资产完整性是三类不同证据。详细 CLI、冻结用例与状态定义见 [AI 迁移使用说明](docs/AI-MIGRATION.md)。
 
 ## AgentIR
 
@@ -77,6 +126,7 @@ manifest 包含 `schema_version: 1`、目标 `format`、`ir_sha256`，以及原�
 1. 实现原生 `emit_<fmt>(ir, out_dir) -> Path` 与 `parse_<fmt>(path) -> AgentIR`。
 2. 在两侧注册表和 `TARGET_FORMATS` 中注册，CLI 使用同一格式集合。
 3. 验证原生产物字段，再检查格式间的 capsule 与资源恢复。
-4. 在格式文档说明原生可表达字段、降级点与运行前需要的配置。
+4. 若加入 AI 迁移，在 `converter/ai_profiles.py` 提供真实框架约束；需要自动验收时增加独立原生适配器。
+5. 在格式文档说明原生可表达字段、降级点与运行前需要的配置。
 
 新增格式的验证必须分别覆盖原生映射和 capsule，不能只确认保存的 IR 被原样读回。
