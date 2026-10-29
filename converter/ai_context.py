@@ -235,7 +235,18 @@ class Redactor:
         if isinstance(value, tuple):
             return [self.scrub(item) for item in value]
         if isinstance(value, dict):
-            return _metadata(value, self)
+            result = {}
+            for key, item in value.items():
+                # A generic business token is not necessarily a credential.
+                # Explicit auth/access/refresh token fields remain sensitive;
+                # known secrets and recognizable key material are still
+                # removed recursively from every string value.
+                normalized = re.sub(r"[^a-z0-9]", "", str(key).lower())
+                if _sensitive_field(str(key)) and normalized != "token":
+                    result.update(_metadata({str(key): item}, self))
+                else:
+                    result[self.text(str(key))] = self.scrub(item)
+            return result
         return value
 
 
