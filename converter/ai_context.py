@@ -229,13 +229,13 @@ class Redactor:
 
     def scrub(self, value: Any) -> Any:
         if isinstance(value, str):
-            return self.text(value)
+            return self.document(value, "diagnostic.md")
         if isinstance(value, list):
             return [self.scrub(item) for item in value]
         if isinstance(value, tuple):
             return [self.scrub(item) for item in value]
         if isinstance(value, dict):
-            return {self.text(str(key)): self.scrub(item) for key, item in value.items()}
+            return _metadata(value, self)
         return value
 
 
