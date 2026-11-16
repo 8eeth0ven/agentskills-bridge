@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="768" height="240" viewBox="0 0 768 240" role="img" aria-labelledby="title desc"><title id="title">检查迁移是否保留行为 · Checking a migrated skill</title><desc id="desc">源技能 · Source contract / 目标实现 · Target runtime / 固定验收用例 · Acceptance cases</desc><rect width="768" height="240" fill="#fff"/><g font-family="system-ui,-apple-system,BlinkMacSystemFont,Segoe UI,PingFang SC,Microsoft YaHei,sans-serif">
+<text x="24" y="40" fill="#171717" font-size="30.0" font-weight="650">检查迁移是否保留行为</text>
+<text x="25" y="67" fill="#555" font-size="19.0" font-weight="450">Checking a migrated skill</text>
+<rect x="24" y="90" width="222" height="126" rx="10" fill="#fafafa" stroke="#d9d9d9"/>
+<g transform="translate(39 104)" fill="none" stroke="#343434" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h12l5 5v17H4z M15 2v7h6 M8 14h9 M8 18h6"/></g>
+<text x="38" y="167" fill="#171717" font-size="26.0" font-weight="600">源技能</text>
+<text x="38" y="195" fill="#4e4e4e" font-size="20.0" font-weight="450">Source contract</text>
+<path d="M250 151h15m-5-5 5 5-5 5" fill="none" stroke="#767676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="272" y="90" width="222" height="126" rx="10" fill="#fafafa" stroke="#d9d9d9"/>
+<g transform="translate(287 104)" fill="none" stroke="#343434" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-7 7 7 7 M17 6l7 7-7 7 M15 3l-4 20"/></g>
+<text x="286" y="167" fill="#171717" font-size="26.0" font-weight="600">目标实现</text>
+<text x="286" y="195" fill="#4e4e4e" font-size="20.0" font-weight="450">Target runtime</text>
+<path d="M498 151h15m-5-5 5 5-5 5" fill="none" stroke="#767676" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="520" y="90" width="222" height="126" rx="10" fill="#fafafa" stroke="#d9d9d9"/>
+<g transform="translate(535 104)" fill="none" stroke="#343434" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M2 13l7 7L23 5"/></g>
+<text x="534" y="167" fill="#171717" font-size="26.0" font-weight="600">固定验收用例</text>
+<text x="534" y="195" fill="#4e4e4e" font-size="20.0" font-weight="450">Acceptance cases</text>
+</g></svg>
